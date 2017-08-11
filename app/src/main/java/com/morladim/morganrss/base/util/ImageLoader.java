@@ -34,7 +34,7 @@ public class ImageLoader {
     }
 
     public static RequestCreator load(String url) {
-        return picasso.load(url).config(Bitmap.Config.RGB_565);
+        return picasso.load(url).config(Bitmap.Config.RGB_565);//.memoryPolicy(MemoryPolicy.NO_CACHE)
     }
 
     public static void resumeTag(Object tag) {

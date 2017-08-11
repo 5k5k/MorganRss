@@ -116,29 +116,37 @@ public class Rss2Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
             ImageLoader.load(item.getImageUrl()).transform(transformation).into(rss2VerticalViewHolder.imageView);
             rss2VerticalViewHolder.imageView.setOnClickListener(new View.OnClickListener() {
+
                 @Override
                 public void onClick(View view) {
                     if (manager != null) {
-                        Observable.just(rss2VerticalViewHolder.imageView)
-                                .subscribeOn(Schedulers.io())
-                                .map(new Function<ImageView, byte[]>() {
-
-                                    @Override
-                                    public byte[] apply(@NonNull ImageView imageView) throws Exception {
-                                        return ImageUtils.imageViewToBytes(imageView);
-                                    }
-                                }).observeOn(AndroidSchedulers.mainThread())
-                                .subscribe(new Consumer<byte[]>() {
-                                    @Override
-                                    public void accept(@NonNull byte[] bytes) throws Exception {
-                                        try {
-                                            manager.setBitmap(bytes);
+//                        Observable.just(rss2VerticalViewHolder.imageView)
+//                                .subscribeOn(Schedulers.io())
+//                                .map(new Function<ImageView, byte[]>() {
+//
+//                                    @Override
+//                                    public byte[] apply(@NonNull ImageView imageView) throws Exception {
+//                                        return ImageUtils.imageViewToBytes(imageView);
+//                                    }
+//                                }).observeOn(AndroidSchedulers.mainThread())
+//                                .subscribe(new Consumer<byte[]>() {
+//                                    @Override
+//                                    public void accept(@NonNull byte[] bytes) throws Exception {
+//                                        try {
+//                                            manager.setBitmap(bytes);
+//                                        } catch (RemoteException e) {
+//                                            e.printStackTrace();
+//                                        }
+//                                        SingleTouchImageViewActivity.startActivityBySceneTrans(item.getImageUrl(), rss2VerticalViewHolder.imageView);
+//                                    }
+//                                });
+                        //起线程的话图片会变白，有意思
+                        try {
+                                            manager.setBitmap(                        ImageUtils.imageViewToBytes(rss2VerticalViewHolder.imageView));
                                         } catch (RemoteException e) {
                                             e.printStackTrace();
                                         }
-                                        SingleTouchImageViewActivity.startActivityBySceneTrans(item.getImageUrl(), rss2VerticalViewHolder.imageView);
-                                    }
-                                });
+                        SingleTouchImageViewActivity.startActivityBySceneTrans(item.getImageUrl(), rss2VerticalViewHolder.imageView);
                     }
                 }
             });

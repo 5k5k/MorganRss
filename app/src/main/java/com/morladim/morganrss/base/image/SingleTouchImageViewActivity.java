@@ -37,13 +37,15 @@ public class SingleTouchImageViewActivity extends Activity {
 
     private TouchImageView imageView;
 
+    private static boolean loading = false;
+
     /**
      * 带元素共享的跳转
      *
      * @param imageUrl 加载图片地址
      * @param view     元素共享ImageView
      */
-    public static void startActivityBySceneTrans(String imageUrl, ImageView view) {
+    public static synchronized void startActivityBySceneTrans(String imageUrl, ImageView view) {
         Context context = view.getContext();
         Intent postIntent = new Intent(context, SingleTouchImageViewActivity.class);
         postIntent.putExtra(SingleTouchImageViewActivity.IMAGE_URL, imageUrl);
@@ -108,6 +110,7 @@ public class SingleTouchImageViewActivity extends Activity {
                         } else {
                             ImageLoader.load(imageUrl).placeholder(new BitmapDrawable(imageView.getResources(), bitmap)).into(imageView);
                         }
+                        loading = false;
                     }
 
                     @Override
@@ -125,5 +128,11 @@ public class SingleTouchImageViewActivity extends Activity {
 
                     }
                 });
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        loading = false;
     }
 }

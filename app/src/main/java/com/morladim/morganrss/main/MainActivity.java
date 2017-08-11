@@ -4,8 +4,10 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -18,6 +20,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 
 import com.morladim.morganrss.IImageManager;
@@ -38,8 +41,6 @@ import io.reactivex.functions.Consumer;
 import me.dkzwm.smoothrefreshlayout.RefreshingListenerAdapter;
 import me.dkzwm.smoothrefreshlayout.SmoothRefreshLayout;
 import me.dkzwm.smoothrefreshlayout.extra.header.ClassicHeader;
-
-//http://blog.csdn.net/qq_37149313/article/details/70264656
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -184,84 +185,6 @@ public class MainActivity extends AppCompatActivity
         });
 
 // TODO: 2017/7/19 需要加入访问网络前网络状态的判断
-//        NewsApi api = createByXML("http://www.baidu.com", NewsApi.class);
-//        api.getXml()
-////        api.getXml("https://www.zhihu.com/rss")
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//
-//                .subscribe(new Consumer<Rss2Xml>() {
-//                    @Override
-//                    public void accept(@io.reactivex.annotations.NonNull Rss2Xml rss2Xml) throws Exception {
-//
-//                        String version = rss2Xml.version;
-//                        if (version != null) {
-//                            long versionId = RssVersionManager.getInstance().insertOrUpdate(version);
-//                            System.out.println("versionId " + versionId);
-////                            Channel channel = ChannelManager. rss2Xml.channel;
-//                            long channelId = ChannelManager.getInstance().insertOrUpdate(rss2Xml.channel, versionId);
-//
-//                            System.out.println("channelId =" + channelId);
-//                            List<Channel> list = ChannelManager.getInstance().getAll();
-//
-//                            System.out.println(ItemManager.getInstance().getAll());
-//                            System.out.println(ItemManager.getInstance().getAll().size());
-//                            System.out.println(ItemManager.getInstance().getAll().get(0).getDescription());
-//                            System.out.println(ItemManager.getInstance().getAll().get(0).getCategoryList());
-//                            CategoryManager.getInstance().getAll();
-//                        }
-//
-//
-//                        System.out.println("ddddddd");
-//                        System.out.println(rss2Xml.channel.title);
-//                        System.out.println(rss2Xml.channel.image.link);
-////                        System.out.println(rss2Xml.channel.atomLink);
-////                        System.out.println(rss2Xml.channel.link);
-////                        System.out.println(rss2Xml.channel.atomLink.href);
-////                        System.out.println(rss2Xml.channel.atomLink.href);
-//                        System.out.println("ddddddd");
-//
-//                        SnackbarHolder.SUCCESS.getNew((findViewById(R.id.content_main))).show();
-//                    }
-//                }, new Consumer<Throwable>() {
-//                    @Override
-//                    public void accept(@NonNull Throwable throwable) throws Exception {
-//                        Toast.makeText(RssApplication.getContext(), throwable.getMessage(), Toast.LENGTH_LONG).show();
-//                        System.out.println(throwable);
-//                    }
-//                });
-
-//        NewsProvider.getXml("http://www.appinn.com/feed/", new Consumer<List<Item>>() {
-//            @Override
-//            public void accept(@NonNull List<Item> items) throws Exception {
-//                System.out.println(items.size());
-//                adapter.refresh(items);
-////                data.addAll(items);
-////                adapter.notifyDataSetChanged();
-//            }
-//        }, new ErrorConsumer(findViewById(R.id.content_main)), adapter.getOffset(), adapter.getLimit());
-//        NewsProvider.getXml("", new Observer<List<Item>>() {
-//            @Override
-//            public void onSubscribe(@NonNull Disposable d) {
-//
-//            }
-//
-//            @Override
-//            public void onNext(@NonNull List<Item> items) {
-//
-//            }
-//
-//            @Override
-//            public void onError(@NonNull Throwable e) {
-//
-//            }
-//
-//            @Override
-//            public void onComplete() {
-//
-//            }
-//        },0,10);
-
         Intent intent = new Intent(this, ImageService.class);
         bindService(intent, connection, Context.BIND_AUTO_CREATE);
 
@@ -426,6 +349,60 @@ public class MainActivity extends AppCompatActivity
 
         return super.onOptionsItemSelected(item);
     }
+
+    /**
+     * 上次触摸时间
+     */
+    private long lastClickTime;
+
+    private boolean interceptDoubleClick = true;
+
+    /**
+     * 是否拦截双击事件
+     *
+     * @param interceptDoubleClick 拦截
+     */
+    protected void setInterceptDoubleClick(boolean interceptDoubleClick) {
+        this.interceptDoubleClick = interceptDoubleClick;
+    }
+
+    /**
+     * 是否处理触摸事件
+     *
+     * @param ev 事件
+     * @return 处理则不下发
+     */
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        if (ev.getAction() == MotionEvent.ACTION_DOWN) {
+            if (isFastClick() && interceptDoubleClick) {
+                return true;
+            }
+        }
+        return super.dispatchTouchEvent(ev);
+    }
+
+    /**
+     * activity中连续点击时间间隔，单位毫秒
+     */
+    public static final int DISPATCH_DURATION = 0;
+
+    /**
+     * 是否连续点击
+     *
+     * @return 连点与否
+     */
+    private boolean isFastClick() {
+        long time = SystemClock.elapsedRealtime();
+        long timeD = time - lastClickTime;
+        if (timeD > 0 && timeD < DISPATCH_DURATION) {
+            return true;
+        } else {
+            lastClickTime = time;
+            return false;
+        }
+    }
+
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
