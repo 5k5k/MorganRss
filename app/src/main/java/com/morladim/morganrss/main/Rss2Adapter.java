@@ -2,10 +2,10 @@ package com.morladim.morganrss.main;
 
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.os.RemoteException;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.Spanned;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,24 +14,15 @@ import android.widget.TextView;
 
 import com.morladim.morganrss.IImageManager;
 import com.morladim.morganrss.R;
-import com.morladim.morganrss.base.RssApplication;
-import com.morladim.morganrss.base.util.DateUtils;
-import com.morladim.morganrss.base.util.ImageLoader;
-import com.morladim.morganrss.base.util.ImageUtils;
 import com.morladim.morganrss.base.database.entity.Item;
 import com.morladim.morganrss.base.image.SingleTouchImageViewActivity;
-import com.squareup.picasso.Picasso;
+import com.morladim.morganrss.base.util.DateUtils;
+import com.morladim.morganrss.base.util.ImageLoader;
 import com.squareup.picasso.Transformation;
 
+import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.List;
-
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.annotations.NonNull;
-import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Function;
-import io.reactivex.schedulers.Schedulers;
 
 /**
  * <br>创建时间：2017/7/24.
@@ -39,6 +30,8 @@ import io.reactivex.schedulers.Schedulers;
  * @author morladim
  */
 public class Rss2Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+
+    public static final String TAG = "Rss2Adapter";
 
     private volatile int offset;
 
@@ -50,22 +43,15 @@ public class Rss2Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private ImageTransformation transformation;
 
-    private IImageManager manager;
-
     public Rss2Adapter(int width) {
         transformation = new ImageTransformation(width);
         data = new ArrayList<>();
     }
 
-
-    public void setManager(IImageManager manager) {
-        this.manager = manager;
-    }
-
     /**
      * 图片在侧边
      */
-    public static final int DEFAULT_ITEM_VIEW_TYPE = 0;
+    private static final int DEFAULT_ITEM_VIEW_TYPE = 0;
 
     /**
      * 图片在上边
@@ -92,15 +78,15 @@ public class Rss2Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 break;
         }
         View view = LayoutInflater.from(parent.getContext()).inflate(layout, parent, false);
-        return new Rss2VerticalViewHolder(view);
+        return new Rss2DefaultViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if (holder != null) {
-            final Rss2VerticalViewHolder rss2VerticalViewHolder = (Rss2VerticalViewHolder) holder;
+            final Rss2DefaultViewHolder rss2DefaultViewHolder = (Rss2DefaultViewHolder) holder;
             final Item item = data.get(position);
-            rss2VerticalViewHolder.title.setText(item.getTitle());
+            rss2DefaultViewHolder.title.setText(item.getTitle());
             String description = item.getDescription().replaceAll("<img.+?>", "");
 //            description = description.replaceAll("<(?<style>[^\\s>]+)[^>]*>(.|\\n)*?</\\k<style>>", "");
             // TODO: 2017/8/9 适配好奇心日报
@@ -109,57 +95,14 @@ public class Rss2Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             }
 
             Spanned spanned = Html.fromHtml(description, imageGetter, null);
+            rss2DefaultViewHolder.description.setText(spanned);
+            rss2DefaultViewHolder.creator.setText(item.getCreator());
+            rss2DefaultViewHolder.date.setText(DateUtils.getTimeToNow(item.getPubDate()));
 
-            rss2VerticalViewHolder.description.setText(spanned);
-            rss2VerticalViewHolder.creator.setText(item.getCreator());
-            rss2VerticalViewHolder.date.setText(DateUtils.getTimeToNow(item.getPubDate()));
-
-            ImageLoader.load(item.getImageUrl()).transform(transformation).into(rss2VerticalViewHolder.imageView);
-            rss2VerticalViewHolder.imageView.setOnClickListener(new View.OnClickListener() {
-
-                @Override
-                public void onClick(View view) {
-                    if (manager != null) {
-//                        Observable.just(rss2VerticalViewHolder.imageView)
-//                                .subscribeOn(Schedulers.io())
-//                                .map(new Function<ImageView, byte[]>() {
-//
-//                                    @Override
-//                                    public byte[] apply(@NonNull ImageView imageView) throws Exception {
-//                                        return ImageUtils.imageViewToBytes(imageView);
-//                                    }
-//                                }).observeOn(AndroidSchedulers.mainThread())
-//                                .subscribe(new Consumer<byte[]>() {
-//                                    @Override
-//                                    public void accept(@NonNull byte[] bytes) throws Exception {
-//                                        try {
-//                                            manager.setBitmap(bytes);
-//                                        } catch (RemoteException e) {
-//                                            e.printStackTrace();
-//                                        }
-//                                        SingleTouchImageViewActivity.startActivityBySceneTrans(item.getImageUrl(), rss2VerticalViewHolder.imageView);
-//                                    }
-//                                });
-                        //起线程的话图片会变白，有意思
-                        try {
-                                            manager.setBitmap(                        ImageUtils.imageViewToBytes(rss2VerticalViewHolder.imageView));
-                                        } catch (RemoteException e) {
-                                            e.printStackTrace();
-                                        }
-                        SingleTouchImageViewActivity.startActivityBySceneTrans(item.getImageUrl(), rss2VerticalViewHolder.imageView);
-                    }
-                }
-            });
+            ImageLoader.load(item.getImageUrl()).transform(transformation).into(rss2DefaultViewHolder.imageView);
+            rss2DefaultViewHolder.imageView.setOnClickListener(new OnItemClickListener(rss2DefaultViewHolder, item.getImageUrl()));
         }
     }
-
-    private final Html.ImageGetter imageGetter = new Html.ImageGetter() {
-
-        @Override
-        public Drawable getDrawable(String s) {
-            return null;
-        }
-    };
 
     @Override
     public int getItemViewType(int position) {
@@ -224,12 +167,12 @@ public class Rss2Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         this.hasMore = hasMore;
     }
 
-    private static class Rss2VerticalViewHolder extends RecyclerView.ViewHolder {
+    private static class Rss2DefaultViewHolder extends RecyclerView.ViewHolder {
 
         TextView title, description, date, creator;
         ImageView imageView;
 
-        Rss2VerticalViewHolder(View itemView) {
+        Rss2DefaultViewHolder(View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.title);
             description = itemView.findViewById(R.id.description);
@@ -238,6 +181,14 @@ public class Rss2Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             creator = itemView.findViewById(R.id.creator);
         }
     }
+
+    private final Html.ImageGetter imageGetter = new Html.ImageGetter() {
+
+        @Override
+        public Drawable getDrawable(String s) {
+            return null;
+        }
+    };
 
     private static class ImageTransformation implements Transformation {
 
@@ -259,8 +210,8 @@ public class Rss2Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             if (result != source) {
                 source.recycle();
             }
-            System.out.println("tar w " + imageWidth);
-            System.out.println("tar h " + targetHeight);
+            Log.d(TAG, "imageWidth " + imageWidth);
+            Log.d(TAG, "imageHeight " + targetHeight);
             return result;
         }
 
@@ -269,18 +220,25 @@ public class Rss2Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             return "imageWidth " + imageWidth;
         }
     }
-//    private static class Rss2HorizontalViewHolder extends RecyclerView.ViewHolder {
-//
-//        TextView title, description, date, creator;
-//        ImageView imageView;
-//
-//        Rss2HorizontalViewHolder(View itemView) {
-//            super(itemView);
-//            title = itemView.findViewById(R.id.title);
-//            description = itemView.findViewById(R.id.description);
-//            imageView = itemView.findViewById(R.id.image);
-//            date = itemView.findViewById(R.id.date);
-//            creator = itemView.findViewById(R.id.creator);
-//        }
-//    }
+
+    private static class OnItemClickListener implements View.OnClickListener {
+
+        private SoftReference<Rss2DefaultViewHolder> holderSoftReference;
+
+        private String url;
+
+        OnItemClickListener(Rss2DefaultViewHolder holderSoftReference, String url) {
+            this.url = url;
+            this.holderSoftReference = new SoftReference<>(holderSoftReference);
+        }
+
+        @Override
+        public void onClick(View view) {
+            synchronized (OnItemClickListener.class) {
+                if (holderSoftReference != null && holderSoftReference.get() != null) {
+                    SingleTouchImageViewActivity.startActivityBySceneTrans(url, holderSoftReference.get().imageView);
+                }
+            }
+        }
+    }
 }

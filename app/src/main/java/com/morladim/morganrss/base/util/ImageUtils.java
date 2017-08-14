@@ -1,6 +1,7 @@
 package com.morladim.morganrss.base.util;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.util.Log;
 import android.widget.ImageView;
@@ -21,6 +22,13 @@ public class ImageUtils {
 
     private ImageUtils() {
 
+    }
+
+    public static Bitmap getBitmapBytes(byte[] buff) {
+        if (buff == null) {
+            return null;
+        }
+        return BitmapFactory.decodeByteArray(buff, 0, buff.length);
     }
 
     // TODO: 2017/8/11 整体无图模式，另外根据网络状态进行ImageLoad加载

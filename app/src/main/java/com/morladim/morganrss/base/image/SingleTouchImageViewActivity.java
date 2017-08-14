@@ -16,6 +16,7 @@ import android.widget.ImageView;
 import com.morladim.morganrss.R;
 import com.morladim.morganrss.base.RssApplication;
 import com.morladim.morganrss.base.util.ImageLoader;
+import com.squareup.picasso.Callback;
 
 /**
  * 展示单张图片Activity，读取ImageHolder保存图片为默认图片。
@@ -37,8 +38,6 @@ public class SingleTouchImageViewActivity extends Activity {
 
     private TouchImageView imageView;
 
-    private static boolean loading = false;
-
     /**
      * 带元素共享的跳转
      *
@@ -58,7 +57,7 @@ public class SingleTouchImageViewActivity extends Activity {
         super.onCreate(savedInstanceState);
         initWindow();
         initImageView();
-        initAnimation();
+        loadImage();
     }
 
     /**
@@ -82,16 +81,28 @@ public class SingleTouchImageViewActivity extends Activity {
                 onBackPressed();
             }
         });
-//        final ColorDrawable imgDefaultDrawable = new ColorDrawable();
-//        imgDefaultDrawable.setColor(ContextCompat.getColor(this, R.color.transparent));
-        if (ImageHolder.getInstance().load() != null) {
-            imageView.setImageBitmap(ImageHolder.getInstance().load());
-        }
+    }
+
+    private void loadImage() {
+        postponeEnterTransition();
+        final String imageUrl = getIntent().getStringExtra(IMAGE_URL);
+        ImageLoader.load(imageUrl).noFade().into(imageView, new Callback() {
+            @Override
+            public void onSuccess() {
+                startPostponedEnterTransition();
+            }
+
+            @Override
+            public void onError() {
+                startPostponedEnterTransition();
+            }
+        });
     }
 
     /**
      * 设置元素共享动画
      */
+    @SuppressWarnings("unused")
     private void initAnimation() {
         getWindow().getEnterTransition().setDuration(500);
         getWindow().getSharedElementEnterTransition().addListener(
@@ -110,7 +121,6 @@ public class SingleTouchImageViewActivity extends Activity {
                         } else {
                             ImageLoader.load(imageUrl).placeholder(new BitmapDrawable(imageView.getResources(), bitmap)).into(imageView);
                         }
-                        loading = false;
                     }
 
                     @Override
@@ -130,9 +140,4 @@ public class SingleTouchImageViewActivity extends Activity {
                 });
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        loading = false;
-    }
 }
