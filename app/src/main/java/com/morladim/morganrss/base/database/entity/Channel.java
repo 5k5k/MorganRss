@@ -34,6 +34,8 @@ public class Channel {
 
     private String atomLink;
 
+    private String requestUrl;
+
     /**
      * 请求次数
      */
@@ -156,6 +158,14 @@ public class Channel {
         this.updateAt = updateAt;
     }
 
+    public String getRequestUrl() {
+        return this.requestUrl;
+    }
+
+    public void setRequestUrl(String requestUrl) {
+        this.requestUrl = requestUrl;
+    }
+
     public Channel(String title) {
         this.title = title;
         createAt = new Date();
@@ -163,10 +173,11 @@ public class Channel {
         times = 0;
     }
 
-    @Generated(hash = 29418316)
+    @Generated(hash = 674873480)
     public Channel(Long id, String title, String description, String imageUrl,
-                   String imageLink, String link, String atomLink, Integer times,
-                   Date lastBuildDate, Long rssVersionId, Date createAt, Date updateAt) {
+            String imageLink, String link, String atomLink, String requestUrl,
+            Integer times, Date lastBuildDate, Long rssVersionId, Date createAt,
+            Date updateAt) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -174,6 +185,7 @@ public class Channel {
         this.imageLink = imageLink;
         this.link = link;
         this.atomLink = atomLink;
+        this.requestUrl = requestUrl;
         this.times = times;
         this.lastBuildDate = lastBuildDate;
         this.rssVersionId = rssVersionId;

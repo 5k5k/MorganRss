@@ -28,7 +28,7 @@ public class NewsProvider {
 
     }
 
-    public static void getXml(String url, Consumer<List<Item>> onNext, Consumer<Throwable> onError, final int offset, final int limit) {
+    public static void getXml(final String url, Consumer<List<Item>> onNext, Consumer<Throwable> onError, final int offset, final int limit) {
         RssHttpClient.getNewsApi().getXml(url)
                 .subscribeOn(Schedulers.io())
                 .map(new Function<Rss2Xml, List<Item>>() {
@@ -37,7 +37,7 @@ public class NewsProvider {
                         String version = rss2Xml.version;
                         if (version != null) {
                             long versionId = RssVersionManager.getInstance().insertOrUpdate(version);
-                            long channelId = ChannelManager.getInstance().insertOrUpdate(rss2Xml.channel, versionId);
+                            long channelId = ChannelManager.getInstance().insertOrUpdate(rss2Xml.channel, versionId, url);
                             return ItemManager.getInstance().getList(channelId, offset, limit);
                         }
                         return null;
@@ -48,7 +48,7 @@ public class NewsProvider {
                 .subscribe(onNext, onError);
     }
 
-    public static void getChannel(String url, Consumer<Channel> onNext, Consumer<Throwable> onError) {
+    public static void getChannel(final String url, Consumer<Channel> onNext, Consumer<Throwable> onError) {
         RssHttpClient.getNewsApi().getXml(url)
                 .subscribeOn(Schedulers.io())
                 .map(new Function<Rss2Xml, Channel>() {
@@ -58,7 +58,7 @@ public class NewsProvider {
                         String version = rss2Xml.version;
                         if (version != null) {
                             long versionId = RssVersionManager.getInstance().insertOrUpdate(version);
-                            long channelId = ChannelManager.getInstance().insertOrUpdate(rss2Xml.channel, versionId);
+                            long channelId = ChannelManager.getInstance().insertOrUpdate(rss2Xml.channel, versionId, url);
                             return ChannelManager.getInstance().getChannelById(channelId);
                         }
                         return null;

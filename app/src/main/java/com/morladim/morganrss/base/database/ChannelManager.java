@@ -43,12 +43,12 @@ public class ChannelManager extends BaseTableManager<Channel, ChannelDao> {
         return DBManager.getDaoSession().getChannelDao();
     }
 
-    public long insertOrUpdate(@NotNull Rss2Channel rss2Channel, long versionId) {
-        Channel channelInDB = getChannelByTitleAndLink(rss2Channel.title, getChannelLink(rss2Channel));
+    public long insertOrUpdate(@NotNull Rss2Channel rss2Channel, long versionId, String requestUrl) {
+        Channel channelInDB = getChannelByTitleAndLink(rss2Channel.title, requestUrl);
 
         long channelId;
         if (channelInDB == null) {
-            channelId = insert(convertXmlToEntity(rss2Channel, versionId));
+            channelId = insert(convertXmlToEntity(rss2Channel, versionId, requestUrl));
         } else {
             channelInDB.setUpdateAt(new Date());
             channelInDB.setTimes(channelInDB.getTimes() + 1);
@@ -65,22 +65,10 @@ public class ChannelManager extends BaseTableManager<Channel, ChannelDao> {
     }
 
     public Channel getChannelByTitleAndLink(String title, String link) {
-        return getDao().queryBuilder().where(ChannelDao.Properties.Title.eq(title), ChannelDao.Properties.Link.eq(link)).unique();
+        return getDao().queryBuilder().where(ChannelDao.Properties.Title.eq(title), ChannelDao.Properties.RequestUrl.eq(link)).unique();
     }
 
-    private String getChannelLink(@NotNull Rss2Channel rss2Channel) {
-        if (rss2Channel.linkList == null) {
-            return null;
-        }
-        for (Link link : rss2Channel.linkList) {
-            if (link.value != null) {
-                return link.value;
-            }
-        }
-        return null;
-    }
-
-    public Channel convertXmlToEntity(@NotNull Rss2Channel rss2Channel, long versionId) {
+    public Channel convertXmlToEntity(@NotNull Rss2Channel rss2Channel, long versionId, String requestUrl) {
         if (TextUtils.isEmpty(rss2Channel.title) || rss2Channel.linkList == null) {
             return null;
         }
@@ -104,6 +92,7 @@ public class ChannelManager extends BaseTableManager<Channel, ChannelDao> {
         channel.setImageLink(rss2Channel.image == null ? null : rss2Channel.image.link);
         channel.setLastBuildDate(rss2Channel.lastBuildDate);
         channel.setRssVersionId(versionId);
+        channel.setRequestUrl(requestUrl);
         return channel;
     }
 }

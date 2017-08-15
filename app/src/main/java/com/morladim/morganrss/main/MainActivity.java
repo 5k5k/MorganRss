@@ -1,20 +1,16 @@
 package com.morladim.morganrss.main;
 
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.os.SystemClock;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
+import android.support.design.widget.TabLayout;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -22,32 +18,17 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.morladim.morganrss.IImageManager;
 import com.morladim.morganrss.R;
 import com.morladim.morganrss.base.database.ChannelManager;
 import com.morladim.morganrss.base.database.entity.Channel;
-import com.morladim.morganrss.base.database.entity.Item;
-import com.morladim.morganrss.base.image.ImageService;
-import com.morladim.morganrss.base.network.ErrorConsumer;
-import com.morladim.morganrss.base.network.NewsProvider;
-import com.morladim.morganrss.base.util.DeviceUtils;
-import com.morladim.morganrss.base.util.ImageLoader;
 
 import java.util.List;
-
-import io.reactivex.annotations.NonNull;
-import io.reactivex.functions.Consumer;
-import me.dkzwm.smoothrefreshlayout.RefreshingListenerAdapter;
-import me.dkzwm.smoothrefreshlayout.SmoothRefreshLayout;
-import me.dkzwm.smoothrefreshlayout.extra.header.ClassicHeader;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    //    MHandler handler = new MHandler();
     private RecyclerView recyclerView;
 
-    //    private List<Item> data;
     private Rss2Adapter adapter;
 
     //    public static final String rssUrl = "http://www.ftchinese.com/rss/feed";
@@ -84,6 +65,7 @@ public class MainActivity extends AppCompatActivity
 //    public static final String rssUrl = "http://feed.read.org.cn";
 //    public static final String rssUrl = "https://www.zhihu.com/rss";
     public static final String rssUrl = "http://www.appinn.com/feed/";
+    List<Channel> list;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,14 +74,15 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        List<Channel> list = ChannelManager.getInstance().getAll();
+        list = ChannelManager.getInstance().getAll();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
+                startActivity(new Intent(MainActivity.this, Main2Activity.class));
             }
         });
 
@@ -112,91 +95,98 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        final SmoothRefreshLayout refreshLayout = (SmoothRefreshLayout) findViewById(R.id.smooth);
-        refreshLayout.setMode(SmoothRefreshLayout.MODE_BOTH);
-        refreshLayout.setHeaderView(new ClassicHeader(this));
-        refreshLayout.setOnRefreshListener(new RefreshingListenerAdapter() {
-            @Override
-            public void onRefreshBegin(boolean isRefresh) {
-                // TODO: 2017/8/8 刷新声音
-                if (isRefresh) {
-                    NewsProvider.getXml(rssUrl, new Consumer<List<Item>>() {
-                        @Override
-                        public void accept(@NonNull List<Item> items) throws Exception {
-                            adapter.refresh(items);
-                            if (items != null && items.size() == adapter.getLimit()) {
-//                                adapter.setHasMore(true);
-                                adapter.setOffset(adapter.getLimit());
-                                refreshLayout.setDisableLoadMore(false);
-                            } else {
-//                                adapter.setHasMore(false);
-                                refreshLayout.setDisableLoadMore(true);
-                            }
-                            refreshLayout.refreshComplete();
+        if (list.size() == 0) {
+            test();
+        } else {
+            t1();
+        }
 
-                        }
-                    }, new ErrorConsumer(findViewById(R.id.content_main)), 0, adapter.getLimit());
-                } else {
-                    NewsProvider.getXml(rssUrl, new Consumer<List<Item>>() {
-                        @Override
-                        public void accept(@NonNull List<Item> items) throws Exception {
-                            adapter.loadMore(items);
-                            if (items != null && items.size() == adapter.getLimit()) {
-//                                adapter.setHasMore(true);
-                                adapter.setOffset(adapter.getOffset() + adapter.getLimit());
-                            } else {
-//                                adapter.setHasMore(false);
-                                refreshLayout.setDisableLoadMore(true);
-                            }
-                            refreshLayout.refreshComplete();
-                        }
-                    }, new ErrorConsumer(findViewById(R.id.content_main)), adapter.getOffset(), adapter.getLimit());
-                }
-            }
-        });
-//        refreshLayout.setOnLoadMoreScrollCallback(new SmoothRefreshLayout.OnLoadMoreScrollCallback() {
+
+//        final SmoothRefreshLayout refreshLayout = (SmoothRefreshLayout) findViewById(R.id.smooth);
+//        refreshLayout.setMode(SmoothRefreshLayout.MODE_BOTH);
+//        refreshLayout.setHeaderView(new ClassicHeader(this));
+//        refreshLayout.setOnRefreshListener(new RefreshingListenerAdapter() {
 //            @Override
-//            public boolean onScroll(View content, float deltaY) {
-//                return false;
+//            public void onRefreshBegin(boolean isRefresh) {
+//                // TODO: 2017/8/8 刷新声音
+//                if (isRefresh) {
+//                    NewsProvider.getXml(rssUrl, new Consumer<List<Item>>() {
+//                        @Override
+//                        public void accept(@NonNull List<Item> items) throws Exception {
+//                            adapter.refresh(items);
+//                            if (items != null && items.size() == adapter.getLimit()) {
+////                                adapter.setHasMore(true);
+//                                adapter.setOffset(adapter.getLimit());
+//                                refreshLayout.setDisableLoadMore(false);
+//                            } else {
+////                                adapter.setHasMore(false);
+//                                refreshLayout.setDisableLoadMore(true);
+//                            }
+//                            refreshLayout.refreshComplete();
+//
+//                        }
+//                    }, new ErrorConsumer(findViewById(R.id.content_main)), 0, adapter.getLimit());
+//                } else {
+//                    NewsProvider.getXml(rssUrl, new Consumer<List<Item>>() {
+//                        @Override
+//                        public void accept(@NonNull List<Item> items) throws Exception {
+//                            adapter.loadMore(items);
+//                            if (items != null && items.size() == adapter.getLimit()) {
+////                                adapter.setHasMore(true);
+//                                adapter.setOffset(adapter.getOffset() + adapter.getLimit());
+//                            } else {
+////                                adapter.setHasMore(false);
+//                                refreshLayout.setDisableLoadMore(true);
+//                            }
+//                            refreshLayout.refreshComplete();
+//                        }
+//                    }, new ErrorConsumer(findViewById(R.id.content_main)), adapter.getOffset(), adapter.getLimit());
+//                }
 //            }
 //        });
+//
+//        refreshLayout.setEnableScrollToBottomAutoLoadMore(true);
+//        refreshLayout.autoRefresh(false);
+//        recyclerView = (RecyclerView) findViewById(R.id.single_recycler);
+//        adapter = new Rss2Adapter(DeviceUtils.getScreenWidth(this));
+//        recyclerView.setAdapter(adapter);
+//        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+//        // TODO: 2017/8/11 tag picasso
+//        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+//            Object tag = new Object();
+//
+//            @Override
+//            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+//                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+//                    ImageLoader.resumeTag(tag);
+//                } else {
+//                    ImageLoader.pauseTag(tag);
+//                }
+//            }
+//        });
+//
+//// TODO: 2017/7/19 需要加入访问网络前网络状态的判断
+//        Intent intent = new Intent(this, ImageService.class);
+//        bindService(intent, connection, Context.BIND_AUTO_CREATE);
+//
+//        test();
+    }
 
+    private void t1() {
+        RssPagerAdapter rssPagerAdapter = new RssPagerAdapter(getSupportFragmentManager(), ChannelManager.getInstance().getAll());
+        ViewPager viewPager = (ViewPager) findViewById(R.id.container);
+        viewPager.setAdapter(rssPagerAdapter);
 
-//        cachedThreadPool.inv
-        refreshLayout.setEnableScrollToBottomAutoLoadMore(true);
-        refreshLayout.autoRefresh(false);
-//        refreshLayout.setONLoad
-        recyclerView = (RecyclerView) findViewById(R.id.single_recycler);
-//        data = new ArrayList<>();
-        adapter = new Rss2Adapter(DeviceUtils.getScreenWidth(this));
-//        adapter = new Rss2Adapter(data);
-        recyclerView.setAdapter(adapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        // TODO: 2017/8/11 tag picasso
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            Object tag = new Object();
-
-            @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                    ImageLoader.resumeTag(tag);
-                } else {
-                    ImageLoader.pauseTag(tag);
-                }
-            }
-        });
-
-// TODO: 2017/7/19 需要加入访问网络前网络状态的判断
-        Intent intent = new Intent(this, ImageService.class);
-        bindService(intent, connection, Context.BIND_AUTO_CREATE);
-
-        test();
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        tabLayout.setupWithViewPager(viewPager);
+        tabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
     }
 
     private void test() {
         MultipleRequestManager.getInstance().generateChannels(new MultipleRequestManager.GenerateChannelsListener() {
             @Override
             public void allDone(int success, int error) {
+                t1();
                 System.out.println("success " + success + " error " + error);
             }
 
@@ -381,26 +371,22 @@ public class MainActivity extends AppCompatActivity
 ////        ;
     }
 
-    public static final Object obj = new Object();
-
-    volatile Integer count;
-
-    private ServiceConnection connection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            IImageManager manager = IImageManager.Stub.asInterface(iBinder);
-//            adapter.setManager(manager);
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-
-        }
-    };
+//    private ServiceConnection connection = new ServiceConnection() {
+//        @Override
+//        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+//            IImageManager manager = IImageManager.Stub.asInterface(iBinder);
+////            adapter.setManager(manager);
+//        }
+//
+//        @Override
+//        public void onServiceDisconnected(ComponentName componentName) {
+//
+//        }
+//    };
 
     @Override
     protected void onDestroy() {
-        unbindService(connection);
+//        unbindService(connection);
         super.onDestroy();
     }
 
