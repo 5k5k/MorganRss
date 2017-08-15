@@ -170,6 +170,7 @@ public class Rss2Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static class Rss2DefaultViewHolder extends RecyclerView.ViewHolder {
 
         TextView title, description, date, creator;
+
         ImageView imageView;
 
         Rss2DefaultViewHolder(View itemView) {
@@ -227,7 +228,7 @@ public class Rss2Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         private String url;
 
-        OnItemClickListener(Rss2DefaultViewHolder holderSoftReference, String url) {
+        private  OnItemClickListener(Rss2DefaultViewHolder holderSoftReference, String url) {
             this.url = url;
             this.holderSoftReference = new SoftReference<>(holderSoftReference);
         }

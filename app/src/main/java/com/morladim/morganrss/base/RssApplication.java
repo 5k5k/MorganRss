@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.morladim.morganrss.base.util.ImageLoader;
 import com.morladim.morganrss.base.util.SharedUtils;
+import com.squareup.leakcanary.LeakCanary;
 
 /**
  * <br>创建时间：2017/7/13.
@@ -23,6 +24,9 @@ public class RssApplication extends Application {
         super.onCreate();
         SharedUtils.init(this);
         ImageLoader.init(this);
+        if (!LeakCanary.isInAnalyzerProcess(this)) {
+            LeakCanary.install(this);
+        }
         context = this;
     }
 

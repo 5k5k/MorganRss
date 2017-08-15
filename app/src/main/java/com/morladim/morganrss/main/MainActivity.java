@@ -4,7 +4,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.SystemClock;
@@ -66,7 +65,7 @@ public class MainActivity extends AppCompatActivity
 //    public static final String rssUrl = "http://www.infoq.com/cn/feed";//待测试
 //    public static final String rssUrl = "http://www.oschina.net/news/rss";
 //    public static final String rssUrl = "http://www.geekpark.net/rss";
-    public static final String rssUrl = "https://www.huxiu.com/rss/4.xml";
+//    public static final String rssUrl = "https://www.huxiu.com/rss/4.xml";
 //    public static final String rssUrl = "https://sspai.com/feed";
 //    public static final String rssUrl = "http://www.pingwest.com/feed/";
 //    public static final String rssUrl = "http://www.sootoo.com/feeds/tag/5.xml";
@@ -84,7 +83,7 @@ public class MainActivity extends AppCompatActivity
 //    public static final String rssUrl = "http://www.williamlong.info/blog/rss.xml";
 //    public static final String rssUrl = "http://feed.read.org.cn";
 //    public static final String rssUrl = "https://www.zhihu.com/rss";
-//    public static final String rssUrl = "http://www.appinn.com/feed/";
+    public static final String rssUrl = "http://www.appinn.com/feed/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -161,6 +160,9 @@ public class MainActivity extends AppCompatActivity
 //                return false;
 //            }
 //        });
+
+
+//        cachedThreadPool.inv
         refreshLayout.setEnableScrollToBottomAutoLoadMore(true);
         refreshLayout.autoRefresh(false);
 //        refreshLayout.setONLoad
@@ -188,13 +190,206 @@ public class MainActivity extends AppCompatActivity
         Intent intent = new Intent(this, ImageService.class);
         bindService(intent, connection, Context.BIND_AUTO_CREATE);
 
+        test();
     }
+
+    private void test() {
+        MultipleRequestManager.getInstance().generateChannels(new MultipleRequestManager.GenerateChannelsListener() {
+            @Override
+            public void allDone(int success, int error) {
+                System.out.println("success " + success + " error " + error);
+            }
+
+            @Override
+            public void oneChannelDone(Channel channel) {
+                System.out.println("mor title " + channel.getTitle());
+            }
+
+            @Override
+            public void oneChannelError() {
+
+            }
+        });
+//        final String[] urls = getResources().getStringArray(R.array.defaultUrls);
+//        System.out.println("mor done " + urls.length);
+
+//        List<Observable<Rss2Xml>> oList = new ArrayList<>(urls.length);
+//        List<Boolean> doneList = new ArrayList<>(urls.length);
+//        for (String u : urls) {
+//            oList.add(RssHttpClient.getNewsApi().getXml(u));
+//            doneList.add(false);
+//        }
+
+//        Observable.zip(oList.iterator(), new Function<Observable<Rss2Xml>[], String>() {
+//            @Override
+//            public String apply(@NonNull Observable<Rss2Xml>[] observables) throws Exception {
+//                return null;
+//            }
+//        }).subscribe();
+//        Observable.zipIterable(oList, new Function<Observable[], Observable>() {
+//            @Override
+//            public Observable apply(@NonNull Observable[] rss2XmlObservable) throws Exception {
+//                return null;
+//            }
+//        },true,1024);
+//        Observable.zip(Observable.fromArray(oList), Observable.fromArray(doneList), new BiFunction<List<Observable<Rss2Xml>>, List<Boolean>, List<String>>() {
+//
+//            @Override
+//            public List<String> apply(@NonNull List<Observable<Rss2Xml>> rss2XmlList, @NonNull List<Boolean> b) throws Exception {
+//                for()
+//                return null;
+//            }
+//        })
+
+
+//        ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
+//
+//        for(int i = 0;i<8;i++ ){
+//        count = urls.length;
+//        for(String url:urls){
+////            String url = urls[i];
+//
+//            NewsProvider.getXml(url, new Consumer<List<Item>>() {
+//                @Override
+//                public void accept(@NonNull List<Item> items) throws Exception {
+//                    synchronized (obj){
+//                        count --;
+//                        System.out.println("mor done "+count);
+//                    }
+//                }
+//            }, new Consumer<Throwable>() {
+//                @Override
+//                public void accept(@NonNull Throwable throwable) throws Exception {
+////                    System.out.println("mor done error");
+//
+//                    synchronized (obj){
+//                        count --;
+//                        System.out.println("mor done error "+count);
+//                    }
+//                }
+//            }, 0, 10);
+//                }
+
+
+//        }
+//        cachedThreadPool.
+
+
+//        Observable.just(urls)
+//                .flatMap(new Function<String[], ObservableSource<String>>() {
+//                    @Override
+//                    public ObservableSource<String> apply(@NonNull String[] strings) throws Exception {
+//                        return Observable.fromArray(strings);
+//                    }
+//                })
+////                .subscribeOn(Schedulers.newThread())
+//                .subscribeOn(Schedulers.io())
+//                .window(1)
+//                .map(new Function<Observable<String>, String>() {
+//                    @Override
+//                    public String apply(@NonNull Observable<String> stringObservable) throws Exception {
+////                        return stringObservable..blockingFirst();
+//                        return null;
+//                    }
+//                }).flatMap(new Function<String, Observable<Rss2Xml>>() {
+//            @Override
+//            public Observable<Rss2Xml> apply(@NonNull String s) throws Exception {
+//                return RssHttpClient.getNewsApi().getXml(s);
+//            }
+//        }).subscribeOn(Schedulers.io())
+////                .flatMap(new Function<Observable<String>, ObservableSource<?>>() {
+////                    @Override
+////                    public ObservableSource<?> apply(@NonNull Observable<String> stringObservable) throws Exception {
+////
+////                      return   stringObservable.subscribe(new Consumer<String>() {
+////                            @Override
+////                            public void accept(@NonNull String s) throws Exception {
+////                            }
+////                        });
+////
+//////                        return RssHttpClient.getNewsApi().getXml(s);
+////                    }
+////                })
+////                .concatMap(new Function<String, ObservableSource<Rss2Xml>>() {
+////                    @Override
+////                    public ObservableSource<Rss2Xml> apply(@NonNull String s) throws Exception {
+////                        return  RssHttpClient.getNewsApi().getXml(s);
+////                    }
+////                })
+//
+////                .map(new Function<String, Rss2Xml>() {
+////            @Override
+////            public Rss2Xml apply(@NonNull String s) throws Exception {
+////                return RssHttpClient.getNewsApi().getXml(s).subscribe();
+////            }
+////        })
+//
+//                .observeOn(AndroidSchedulers.mainThread())
+////                .subscribe()
+//                .map(new Function<Rss2Xml, List<Item>>() {
+//                    @Override
+//                    public List<Item> apply(@NonNull Rss2Xml rss2Xml) throws Exception {
+//                        String version = rss2Xml.version;
+//                        if (version != null) {
+//                            long versionId = RssVersionManager.getInstance().insertOrUpdate(version);
+//                            long channelId = ChannelManager.getInstance().insertOrUpdate(rss2Xml.channel, versionId);
+//                            return ItemManager.getInstance().getList(channelId, 0, 10);
+//                        }
+//                        return null;
+//                    }
+//                })
+//                .retry(3).subscribe(new Consumer<List<Item>>() {
+//            @Override
+//            public void accept(@NonNull List<Item> items) throws Exception {
+//                System.out.println("mor done ");
+//            }
+//        }, new Consumer<Throwable>() {
+//            @Override
+//            public void accept(@NonNull Throwable throwable) throws Exception {
+//                System.out.println("mor done error");
+//
+//            }
+//        }, new Action() {
+//            @Override
+//            public void run() throws Exception {
+//                System.out.println("mor done all");
+//
+//            }
+//        });
+////                .subscribe(new Consumer<String>() {
+////                    @Override
+////                    public void accept(@NonNull String s) throws Exception {
+////                        NewsProvider.getXml(s, new Consumer<List<Item>>() {
+////                            @Override
+////                            public void accept(@NonNull List<Item> items) throws Exception {
+////                                System.out.println("mor done ");
+////                            }
+////                        }, new ErrorConsumer(findViewById(R.id.content_main)), 0, 10);
+////                    }
+////                }, new Consumer<Throwable>() {
+////                    @Override
+////                    public void accept(@NonNull Throwable throwable) throws Exception {
+////                        System.out.println("mor done error");
+////
+////                    }
+////                }, new Action() {
+////                    @Override
+////                    public void run() throws Exception {
+////                        System.out.println("mor done all");
+////                    }
+////                })
+////        ;
+    }
+
+    public static final Object obj = new Object();
+
+    volatile Integer count;
 
     private ServiceConnection connection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             IImageManager manager = IImageManager.Stub.asInterface(iBinder);
-            adapter.setManager(manager);
+//            adapter.setManager(manager);
         }
 
         @Override

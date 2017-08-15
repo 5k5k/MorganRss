@@ -3,4 +3,41 @@
     <string-array name="error_consumer_type">
         <item>网络响应失败！</item>
     </string-array>
+
+    <string-array name="defaultUrls">
+        <item>http://www.appinn.com/feed</item>
+        <item>https://www.zhihu.com/rss</item>
+        <item>http://www.ifanr.com/feed</item>
+        <item>http://feed.smzdm.com/</item>
+        <item>http://36kr.com/feed/</item>
+        <item>http://www.ftchinese.com/rss/feed</item>
+        <item>http://techcrunch.cn/feed/</item>
+        <item>http://www.pocketgamer.co.uk/rss.asp</item>
+        <item>https://www.gamespot.com/feeds/news/</item>
+        <item>http://davidkphotography.com/index.php?x=rss</item>
+        <item>http://www.techlearning.com/RSS</item>
+        <item>http://feeds.washingtonpost.com/rss/rss_blogpost</item>
+        <item>http://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml</item>
+        <item>http://www.toodaylab.com/feed</item>
+        <item>http://www.qingniantuzhai.com/feed</item>
+        <item>http://jandan.net/feed</item>
+        <item>http://www.dxy.cn/bbs/rss/2.0/all.xml</item>
+        <item>http://www.infoq.com/cn/feed</item>
+        <item>http://www.oschina.net/news/rss</item>
+        <item>http://www.geekpark.net/rss</item>
+        <item>https://www.huxiu.com/rss/4.xml</item>
+        <item>https://sspai.com/feed</item>
+        <item>http://www.pingwest.com/feed/</item>
+        <item>http://www.sootoo.com/feeds/tag/5.xml</item>
+        <item>https://www.huxiu.com/rss/0.xml</item>
+        <item>http://www.tmtpost.com/rss.xml</item>
+        <item>http://www.qdaily.com/feed.xml</item>
+        <item>http://www.techweb.com.cn/rss/focus.xml</item>
+        <item>http://cn.engadget.com/rss.xml</item>
+        <item>http://www.juzicy.com/blog/feed</item>
+        <item>http://www.adaymag.com/feed/</item>
+        <item>http://www.williamlong.info/blog/rss.xml</item>
+        <item>http://feed.read.org.cn</item>
+    </string-array>
+
 </resources>

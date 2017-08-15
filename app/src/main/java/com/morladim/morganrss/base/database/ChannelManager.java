@@ -60,6 +60,10 @@ public class ChannelManager extends BaseTableManager<Channel, ChannelDao> {
         return channelId;
     }
 
+    public Channel getChannelById(long channelId) {
+        return getDao().queryBuilder().where(ChannelDao.Properties.Id.eq(channelId)).unique();
+    }
+
     public Channel getChannelByTitleAndLink(String title, String link) {
         return getDao().queryBuilder().where(ChannelDao.Properties.Title.eq(title), ChannelDao.Properties.Link.eq(link)).unique();
     }

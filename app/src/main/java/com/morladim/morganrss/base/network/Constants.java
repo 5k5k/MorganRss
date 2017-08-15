@@ -9,10 +9,10 @@ class Constants {
 
     static final String COOKIE = "cookie";
 
-    static final int RETRY_TIMES = 3;
+    static final int RETRY_TIMES = 2;
 
     static final int CONNECT_TIME_OUT = 10;
-    static final int READ_TIME_OUT = 10;
-    static final int WRITE_TIME_OUT = 10;
+    static final int READ_TIME_OUT = 5;
+    static final int WRITE_TIME_OUT = 5;
 
 }
