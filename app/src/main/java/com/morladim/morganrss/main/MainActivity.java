@@ -30,6 +30,7 @@ import com.morladim.morganrss.base.util.SnackbarHolder;
 
 import java.util.List;
 
+//chrome://inspect/#devices
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
