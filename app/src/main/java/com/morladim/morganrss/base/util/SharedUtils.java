@@ -68,12 +68,12 @@ public class SharedUtils {
         editor.apply();
     }
 
-    public static synchronized void saveBolean(String key, boolean b) {
+    public static synchronized void saveBoolean(String key, boolean b) {
         editor.putBoolean(key, b);
         editor.apply();
     }
 
-    public static synchronized boolean loadBolean(String key) {
+    public static synchronized boolean loadBoolean(String key) {
         return preferences.getBoolean(key, false);
     }
 

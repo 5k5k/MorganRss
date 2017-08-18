@@ -99,6 +99,13 @@ public class SingleTouchImageViewActivity extends Activity {
         });
     }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        loadImage();
+    }
+
     /**
      * 设置元素共享动画
      */

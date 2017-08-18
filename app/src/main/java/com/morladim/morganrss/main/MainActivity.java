@@ -1,5 +1,6 @@
 package com.morladim.morganrss.main;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -10,6 +11,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -17,10 +19,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
 import com.morladim.morganrss.R;
 import com.morladim.morganrss.base.database.ChannelManager;
 import com.morladim.morganrss.base.database.entity.Channel;
+import com.morladim.morganrss.base.util.AppUtils;
+import com.morladim.morganrss.base.util.NetworkUtils;
+import com.morladim.morganrss.base.util.SnackbarHolder;
 
 import java.util.List;
 
@@ -95,13 +101,38 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        if (list.size() == 0) {
-            test();
-        } else {
-            t1();
+
+        switch (NetworkUtils.checkNetworkState()) {
+            case NetworkUtils.WIFI_CONNECTED:
+                if (list.size() == 0) {
+                    test();
+                } else {
+                    t1();
+                }
+                break;
+            case NetworkUtils.NO_WIFI:
+                if (AppUtils.isNoImageMode()) {
+                    Toast.makeText(this, "wutu", Toast.LENGTH_LONG).show();
+                } else {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setTitle("开启移动网络无图模式")
+                            .setMessage("是否只在Wifi网络环境下加载图片，强烈建议开启该设置以节约流量。\n您可以随时在设置中更改该设置。").setPositiveButton("开启", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            AppUtils.setNoImageMode(true);
+                        }
+                    }).setNegativeButton("不开启", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                        }
+                    }).setCancelable(false).show();
+                }
+                break;
+            case NetworkUtils.NO_NETWORK:
+                SnackbarHolder.ERROR.getNew(findViewById(R.id.content_main), "网络无法连接！");
+                break;
         }
-
-
 //        final SmoothRefreshLayout refreshLayout = (SmoothRefreshLayout) findViewById(R.id.smooth);
 //        refreshLayout.setMode(SmoothRefreshLayout.MODE_BOTH);
 //        refreshLayout.setHeaderView(new ClassicHeader(this));

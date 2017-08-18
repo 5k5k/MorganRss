@@ -5,6 +5,7 @@ import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.Spanned;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,12 +13,13 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.morladim.morganrss.IImageManager;
 import com.morladim.morganrss.R;
 import com.morladim.morganrss.base.database.entity.Item;
 import com.morladim.morganrss.base.image.SingleTouchImageViewActivity;
+import com.morladim.morganrss.base.util.AppUtils;
 import com.morladim.morganrss.base.util.DateUtils;
 import com.morladim.morganrss.base.util.ImageLoader;
+import com.morladim.morganrss.base.web.WebActivity;
 import com.squareup.picasso.Transformation;
 
 import java.lang.ref.SoftReference;
@@ -100,7 +102,8 @@ public class Rss2Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             rss2DefaultViewHolder.date.setText(DateUtils.getTimeToNow(item.getPubDate()));
 
             ImageLoader.load(item.getImageUrl()).transform(transformation).into(rss2DefaultViewHolder.imageView);
-            rss2DefaultViewHolder.imageView.setOnClickListener(new OnItemClickListener(rss2DefaultViewHolder, item.getImageUrl()));
+            rss2DefaultViewHolder.imageView.setOnClickListener(new OnImageClickListener(rss2DefaultViewHolder, item.getImageUrl()));
+            rss2DefaultViewHolder.contentArea.setOnClickListener(new OnItemClickListener(rss2DefaultViewHolder, item.getTitle(), TextUtils.isEmpty(item.getContent()) ? item.getDescription() : item.getContent()));
         }
     }
 
@@ -173,6 +176,8 @@ public class Rss2Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         ImageView imageView;
 
+        View contentArea;
+
         Rss2DefaultViewHolder(View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.title);
@@ -180,6 +185,7 @@ public class Rss2Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             imageView = itemView.findViewById(R.id.image);
             date = itemView.findViewById(R.id.date);
             creator = itemView.findViewById(R.id.creator);
+            contentArea = itemView.findViewById(R.id.contentArea);
         }
     }
 
@@ -222,22 +228,46 @@ public class Rss2Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
     }
 
-    private static class OnItemClickListener implements View.OnClickListener {
+    private static class OnImageClickListener implements View.OnClickListener {
 
         private SoftReference<Rss2DefaultViewHolder> holderSoftReference;
 
         private String url;
 
-        private  OnItemClickListener(Rss2DefaultViewHolder holderSoftReference, String url) {
+        private OnImageClickListener(Rss2DefaultViewHolder holderSoftReference, String url) {
             this.url = url;
             this.holderSoftReference = new SoftReference<>(holderSoftReference);
         }
 
         @Override
         public void onClick(View view) {
-            synchronized (OnItemClickListener.class) {
+            synchronized (OnImageClickListener.class) {
                 if (holderSoftReference != null && holderSoftReference.get() != null) {
                     SingleTouchImageViewActivity.startActivityBySceneTrans(url, holderSoftReference.get().imageView);
+                }
+            }
+        }
+    }
+
+    private static class OnItemClickListener implements View.OnClickListener {
+
+        private SoftReference<Rss2DefaultViewHolder> holderSoftReference;
+
+        private String title;
+
+        private String content;
+
+        private OnItemClickListener(Rss2DefaultViewHolder holder, String title, String content) {
+            this.title = title;
+            this.content = content;
+            this.holderSoftReference = new SoftReference<>(holder);
+        }
+
+        @Override
+        public void onClick(View view) {
+            synchronized (OnImageClickListener.class) {
+                if (holderSoftReference != null && holderSoftReference.get() != null) {
+                    WebActivity.startNewActivity(holderSoftReference.get().title.getContext(), AppUtils.isNoImageMode(), content);
                 }
             }
         }

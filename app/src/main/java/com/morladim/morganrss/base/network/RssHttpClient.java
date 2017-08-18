@@ -1,5 +1,7 @@
 package com.morladim.morganrss.base.network;
 
+import com.facebook.stetho.okhttp3.StethoInterceptor;
+
 import org.simpleframework.xml.convert.AnnotationStrategy;
 import org.simpleframework.xml.core.Persister;
 
@@ -51,6 +53,7 @@ class RssHttpClient {
                 .addInterceptor(new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
                 .addInterceptor(new CookieInterceptor())
                 .addInterceptor(new HeadInterceptor())
+                .addNetworkInterceptor(new StethoInterceptor())
                 .build();
     }
 

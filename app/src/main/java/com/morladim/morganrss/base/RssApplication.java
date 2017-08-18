@@ -2,7 +2,9 @@ package com.morladim.morganrss.base;
 
 import android.app.Application;
 
+import com.facebook.stetho.Stetho;
 import com.morladim.morganrss.base.util.ImageLoader;
+import com.morladim.morganrss.base.util.NetworkUtils;
 import com.morladim.morganrss.base.util.SharedUtils;
 import com.squareup.leakcanary.LeakCanary;
 
@@ -24,6 +26,8 @@ public class RssApplication extends Application {
         super.onCreate();
         SharedUtils.init(this);
         ImageLoader.init(this);
+        NetworkUtils.init(this);
+        Stetho.initializeWithDefaults(this);
         if (!LeakCanary.isInAnalyzerProcess(this)) {
             LeakCanary.install(this);
         }
