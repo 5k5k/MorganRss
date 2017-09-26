@@ -37,13 +37,6 @@
             android:process=":picture" />
 
         <activity
-            android:name=".main.SettingsActivity"
-            android:label="@string/title_activity_settings" />
-        <activity
-            android:name=".main.Main2Activity"
-            android:label="@string/title_activity_main2"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
             android:name=".base.web.WebActivity"
             android:launchMode="singleTop"
             android:theme="@style/AppTheme.NoActionBar"
