@@ -49,7 +49,7 @@ public class RssVersionManager extends BaseTableManager<RssVersion, RssVersionDa
      * @param versionName rss版本名
      * @return 插入行号
      */
-    public long insertOrUpdate(@NotNull String versionName) {
+    public synchronized long insertOrUpdate(@NotNull String versionName) {
         RssVersion versionInDB = getVersionByName(versionName);
         if (versionInDB == null) {
             return insert(new RssVersion(versionName));

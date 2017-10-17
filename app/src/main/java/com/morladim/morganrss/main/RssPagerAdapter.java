@@ -3,19 +3,22 @@ package com.morladim.morganrss.main;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.view.ViewGroup;
 
 import com.morladim.morganrss.base.database.entity.Channel;
 
 import java.util.List;
 
 /**
+ * 展示所有Rss频道信息的PagerAdapter
  * <br>创建时间：2017/8/15.
  *
  * @author morladim
  */
-public class RssPagerAdapter extends FragmentPagerAdapter {
+public class RssPagerAdapter extends FragmentStatePagerAdapter {
 
-    private List<Channel> data;
+    private volatile List<Channel> data;
 
     public RssPagerAdapter(FragmentManager fm, List<Channel> data) {
         super(fm);
@@ -28,6 +31,12 @@ public class RssPagerAdapter extends FragmentPagerAdapter {
         return RssFragment.newInstance(channel.getTitle(), channel.getRequestUrl(), channel.getId());
     }
 
+//    @Override
+//    public Object instantiateItem(ViewGroup container, int position) {
+//        Channel channel = data.get(position);
+//        return RssFragment.newInstance(channel.getTitle(), channel.getRequestUrl(), channel.getId());
+//    }
+
     @Override
     public int getCount() {
         return data.size();
@@ -37,4 +46,14 @@ public class RssPagerAdapter extends FragmentPagerAdapter {
     public CharSequence getPageTitle(int position) {
         return data.get(position).getTitle();
     }
+
+    public void addItem(Channel channel) {
+        data.add(channel);
+        notifyDataSetChanged();
+    }
+
+//    @Override
+//    public int getItemPosition(Object object) {
+//        return POSITION_NONE;
+//    }
 }
