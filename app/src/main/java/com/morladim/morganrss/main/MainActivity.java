@@ -14,7 +14,6 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.morladim.morganrss.R;
 import com.morladim.morganrss.base.database.ChannelManager;
@@ -32,6 +31,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
+
 
 //chrome://inspect/#devices
 public class MainActivity extends BaseActivity
@@ -123,12 +123,16 @@ public class MainActivity extends BaseActivity
 
     private void initViewPager(List<Channel> list) {
         rssPagerAdapter = new RssPagerAdapter(getSupportFragmentManager(), list);
-        ViewPager viewPager = (ViewPager) findViewById(R.id.container);
-        viewPager.setAdapter(rssPagerAdapter);
-
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
-        tabLayout.setupWithViewPager(viewPager);
-        tabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                ViewPager viewPager = (ViewPager) findViewById(R.id.container);
+                viewPager.setAdapter(rssPagerAdapter);
+                TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+                tabLayout.setupWithViewPager(viewPager);
+                tabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
+            }
+        });
     }
 
     private void getDataFromNet() {

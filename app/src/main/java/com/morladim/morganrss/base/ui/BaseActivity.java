@@ -47,7 +47,7 @@ public class BaseActivity extends AppCompatActivity {
     /**
      * activity中连续点击时间间隔，单位毫秒
      */
-    public static final int DISPATCH_DURATION = 0;
+    public static final int DISPATCH_DURATION = 200;
 
     /**
      * 是否连续点击
