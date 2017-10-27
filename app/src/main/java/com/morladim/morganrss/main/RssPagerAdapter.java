@@ -2,9 +2,7 @@ package com.morladim.morganrss.main;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.view.ViewGroup;
 
 import com.morladim.morganrss.base.database.entity.Channel;
 
@@ -31,12 +29,6 @@ public class RssPagerAdapter extends FragmentStatePagerAdapter {
         return RssFragment.newInstance(channel.getTitle(), channel.getRequestUrl(), channel.getId());
     }
 
-//    @Override
-//    public Object instantiateItem(ViewGroup container, int position) {
-//        Channel channel = data.get(position);
-//        return RssFragment.newInstance(channel.getTitle(), channel.getRequestUrl(), channel.getId());
-//    }
-
     @Override
     public int getCount() {
         return data.size();
@@ -52,8 +44,4 @@ public class RssPagerAdapter extends FragmentStatePagerAdapter {
         notifyDataSetChanged();
     }
 
-//    @Override
-//    public int getItemPosition(Object object) {
-//        return POSITION_NONE;
-//    }
 }

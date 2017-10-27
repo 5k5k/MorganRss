@@ -11,11 +11,11 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.morladim.morganrss.R;
+import com.morladim.morganrss.base.database.CategoryManager;
 import com.morladim.morganrss.base.database.ChannelManager;
 import com.morladim.morganrss.base.database.entity.Channel;
 import com.morladim.morganrss.base.ui.BaseActivity;
@@ -31,12 +31,13 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
+import timber.log.Timber;
 
-
-//chrome://inspect/#devices
+/**
+ * @author morladim
+ */
 public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-    public static final String TAG = "MainActivity";
     private List<Channel> list;
     private RssPagerAdapter rssPagerAdapter;
 
@@ -55,7 +56,7 @@ public class MainActivity extends BaseActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
+        drawer.addDrawerListener(toggle);
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
@@ -70,21 +71,25 @@ public class MainActivity extends BaseActivity
                     public Integer apply(@NonNull Integer integer) throws Exception {
                         list = ChannelManager.getInstance().getAll();
                         switch (NetworkUtils.checkNetworkState()) {
-                            case NetworkUtils.WIFI_CONNECTED:
-                                showData();
-                                break;
                             case NetworkUtils.NO_WIFI:
-                                if (AppUtils.isNoImageMode()) {
-//                                    Toast.makeText(MainActivity.this, "wutu", Toast.LENGTH_LONG).show();
-                                    showData();
-                                } else {
+                                if (!AppUtils.isNoImageMode()) {
                                     return 1;
                                 }
                                 break;
                             case NetworkUtils.NO_NETWORK:
                                 SnackbarHolder.ERROR.getNew(findViewById(R.id.content_main), "网络无法连接！");
-                                showData();
                                 break;
+                            case NetworkUtils.WIFI_CONNECTED:
+                            default:
+                                break;
+                        }
+                        for(int i=0;i<500;i++){
+                            new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    CategoryManager.getInstance().insertOrUpdate("2");
+                                }
+                            }).start();
                         }
                         return 0;
                     }
@@ -108,6 +113,8 @@ public class MainActivity extends BaseActivity
                                     showData();
                                 }
                             }).setCancelable(false).show();
+                        } else {
+                            showData();
                         }
                     }
                 });
@@ -123,16 +130,11 @@ public class MainActivity extends BaseActivity
 
     private void initViewPager(List<Channel> list) {
         rssPagerAdapter = new RssPagerAdapter(getSupportFragmentManager(), list);
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                ViewPager viewPager = (ViewPager) findViewById(R.id.container);
-                viewPager.setAdapter(rssPagerAdapter);
-                TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
-                tabLayout.setupWithViewPager(viewPager);
-                tabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
-            }
-        });
+        ViewPager viewPager = (ViewPager) findViewById(R.id.container);
+        viewPager.setAdapter(rssPagerAdapter);
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        tabLayout.setupWithViewPager(viewPager);
+        tabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
     }
 
     private void getDataFromNet() {
@@ -141,14 +143,13 @@ public class MainActivity extends BaseActivity
         MultipleRequestManager.getInstance().generateChannels(new MultipleRequestManager.GenerateChannelsListener() {
             @Override
             public void allDone(int success, int error) {
-//                initViewPager();
-                Log.d(TAG, "channel load done success " + success + " error " + error);
+                Timber.d("channel load done success %s, error %s", success, error);
             }
 
             @Override
             public void oneChannelDone(Channel channel) {
                 rssPagerAdapter.addItem(channel);
-                Log.d(TAG, "channel loaded title " + channel.getTitle());
+                Timber.d("channel loaded title  %s", channel.getTitle());
             }
 
             @Override

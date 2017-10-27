@@ -25,6 +25,8 @@ public class ItemManager extends BaseTableManager<Item, ItemDao> {
 
     private volatile static ItemManager instance;
 
+    public static final Byte LOCK = 0;
+
     public static ItemManager getInstance() {
         if (instance == null) {
             synchronized (ItemManager.class) {
@@ -38,7 +40,7 @@ public class ItemManager extends BaseTableManager<Item, ItemDao> {
 
     @Override
     protected ItemDao getDao() {
-        return DBManager.getDaoSession().getItemDao();
+        return DbManager.getDaoSession().getItemDao();
     }
 
     public void insertOrUpdateList(List<Rss2Item> rss2ItemList, Long channelId) {
@@ -51,13 +53,15 @@ public class ItemManager extends BaseTableManager<Item, ItemDao> {
     }
 
     public void insertOrUpdate(Rss2Item rss2Item, long channelId) {
-        Item itemInDB = getDao().queryBuilder().where(ItemDao.Properties.ChannelId.eq(channelId), ItemDao.Properties.Link.eq(rss2Item.link), ItemDao.Properties.Title.eq(rss2Item.title)).unique();
         long itemId;
-        if (itemInDB == null) {
-            itemId = insert(convertXmlToEntity(rss2Item, channelId));
-        } else {
-            updateEntityFromXml(rss2Item, itemInDB);
-            itemId = itemInDB.getId();
+        synchronized (LOCK) {
+            Item itemInDB = getDao().queryBuilder().where(ItemDao.Properties.ChannelId.eq(channelId), ItemDao.Properties.Link.eq(rss2Item.link), ItemDao.Properties.Title.eq(rss2Item.title)).unique();
+            if (itemInDB == null) {
+                itemId = insert(convertXmlToEntity(rss2Item, channelId));
+            } else {
+                updateEntityFromXml(rss2Item, itemInDB);
+                itemId = itemInDB.getId();
+            }
         }
         CategoryManager.getInstance().insertOrUpdateList(rss2Item.categoryList, itemId);
     }
@@ -106,7 +110,7 @@ public class ItemManager extends BaseTableManager<Item, ItemDao> {
                 try {
                     event = parser.next();
                 } catch (Exception e) {
-//                    e.printStackTrace();
+
                 }
             }
         } catch (Exception e) {

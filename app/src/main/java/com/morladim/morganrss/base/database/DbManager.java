@@ -11,27 +11,27 @@ import com.morladim.morganrss.base.database.dao.DaoSession;
  * @author morladim.
  */
 
-class DBManager {
+class DbManager {
 
     ///////////////////////////////////////////////////////////////////////////
     // 调试时报错，需要关闭Instant Run。
     ///////////////////////////////////////////////////////////////////////////
 
-    private final static String dbName = "test_db";
-    private volatile static DBManager instance;
+    private static final String DB_NAME = "rss_db";
+    private volatile static DbManager instance;
     private DaoSession daoSession;
 
-    private DBManager(RssApplication context) {
-        DaoMaster.DevOpenHelper openHelper = new DaoMaster.DevOpenHelper(context, dbName);
+    private DbManager(RssApplication context) {
+        DaoMaster.DevOpenHelper openHelper = new DaoMaster.DevOpenHelper(context, DB_NAME);
         DaoMaster daoMaster = new DaoMaster(openHelper.getWritableDatabase());
         daoSession = daoMaster.newSession();
     }
 
-    private static DBManager getInstance() {
+    private static DbManager getInstance() {
         if (instance == null) {
-            synchronized (DBManager.class) {
+            synchronized (DbManager.class) {
                 if (instance == null) {
-                    instance = new DBManager(RssApplication.getContext());
+                    instance = new DbManager(RssApplication.getContext());
                 }
             }
         }

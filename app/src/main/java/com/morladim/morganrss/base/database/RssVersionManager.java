@@ -36,7 +36,7 @@ public class RssVersionManager extends BaseTableManager<RssVersion, RssVersionDa
 
     @Override
     protected RssVersionDao getDao() {
-        return DBManager.getDaoSession().getRssVersionDao();
+        return DbManager.getDaoSession().getRssVersionDao();
     }
 
     public RssVersion getVersionByName(@NotNull String name) {

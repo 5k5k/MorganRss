@@ -26,7 +26,7 @@ public class ItemJoinCategoryManager extends BaseTableManager<ItemJoinCategory, 
 
     @Override
     protected ItemJoinCategoryDao getDao() {
-        return DBManager.getDaoSession().getItemJoinCategoryDao();
+        return DbManager.getDaoSession().getItemJoinCategoryDao();
     }
 
     public boolean existInDB(Long itemId, Long categoryId) {

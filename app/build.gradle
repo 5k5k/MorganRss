@@ -41,7 +41,7 @@ android {
 }
 
 greendao {
-    schemaVersion 7
+    schemaVersion 1
     daoPackage 'com.morladim.morganrss.base.database.dao'
     targetGenDir 'src/main/java/'
 }
@@ -84,6 +84,6 @@ dependencies {
     debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5.2'
     releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.2'
 
-    compile 'com.jakewharton.timber:timber:4.5.1'
+    compile 'com.morladim:tools:0.0.2'
     compile 'org.jetbrains:annotations-java5:15.0'
 }

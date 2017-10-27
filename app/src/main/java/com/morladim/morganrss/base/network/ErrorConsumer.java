@@ -12,6 +12,7 @@ import java.lang.ref.SoftReference;
 
 import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Consumer;
+import timber.log.Timber;
 
 /**
  * <br>创建时间：2017/7/20.
@@ -42,6 +43,7 @@ public class ErrorConsumer implements Consumer<Throwable> {
     @Override
     public void accept(@NonNull Throwable throwable) throws Exception {
         if (reference != null && reference.get() != null) {
+            Timber.e(throwable);
             Toast.makeText(RssApplication.getContext(), throwable.getMessage(), Toast.LENGTH_LONG).show();
             SnackbarHolder.show(SnackbarHolder.ERROR.getNew(reference.get(), error == null ? throwable.getMessage() : error));
         }

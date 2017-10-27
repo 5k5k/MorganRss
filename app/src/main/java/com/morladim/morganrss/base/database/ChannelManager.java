@@ -23,6 +23,8 @@ public class ChannelManager extends BaseTableManager<Channel, ChannelDao> {
 
     private volatile static ChannelManager channelManager;
 
+    public static final Byte LOCK = 0;
+
     private ChannelManager() {
 
     }
@@ -40,22 +42,26 @@ public class ChannelManager extends BaseTableManager<Channel, ChannelDao> {
 
     @Override
     protected ChannelDao getDao() {
-        return DBManager.getDaoSession().getChannelDao();
+        return DbManager.getDaoSession().getChannelDao();
     }
 
     public long insertOrUpdate(@NotNull Rss2Channel rss2Channel, long versionId, String requestUrl) {
-        Channel channelInDB = getChannelByTitleAndLink(rss2Channel.title, requestUrl);
-
         long channelId;
-        if (channelInDB == null) {
-            channelId = insert(convertXmlToEntity(rss2Channel, versionId, requestUrl));
-        } else {
-            channelInDB.setUpdateAt(new Date());
-            channelInDB.setTimes(channelInDB.getTimes() + 1);
-            channelInDB.setLastBuildDate(rss2Channel.lastBuildDate);
-            update(channelInDB);
-            channelId = channelInDB.getId();
+
+        synchronized (LOCK) {
+            Channel channelInDB = getChannelByTitleAndLink(rss2Channel.title, requestUrl);
+
+            if (channelInDB == null) {
+                channelId = insert(convertXmlToEntity(rss2Channel, versionId, requestUrl));
+            } else {
+                channelInDB.setUpdateAt(new Date());
+                channelInDB.setTimes(channelInDB.getTimes() + 1);
+                channelInDB.setLastBuildDate(rss2Channel.lastBuildDate);
+                update(channelInDB);
+                channelId = channelInDB.getId();
+            }
         }
+
         ItemManager.getInstance().insertOrUpdateList(rss2Channel.itemList, channelId);
         return channelId;
     }
