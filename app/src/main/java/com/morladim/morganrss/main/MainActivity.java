@@ -15,7 +15,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.morladim.morganrss.R;
-import com.morladim.morganrss.base.database.CategoryManager;
 import com.morladim.morganrss.base.database.ChannelManager;
 import com.morladim.morganrss.base.database.entity.Channel;
 import com.morladim.morganrss.base.ui.BaseActivity;
@@ -50,16 +49,16 @@ public class MainActivity extends BaseActivity
 
     private void initView() {
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
     }
 
@@ -82,14 +81,6 @@ public class MainActivity extends BaseActivity
                             case NetworkUtils.WIFI_CONNECTED:
                             default:
                                 break;
-                        }
-                        for(int i=0;i<500;i++){
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    CategoryManager.getInstance().insertOrUpdate("2");
-                                }
-                            }).start();
                         }
                         return 0;
                     }
@@ -130,9 +121,9 @@ public class MainActivity extends BaseActivity
 
     private void initViewPager(List<Channel> list) {
         rssPagerAdapter = new RssPagerAdapter(getSupportFragmentManager(), list);
-        ViewPager viewPager = (ViewPager) findViewById(R.id.container);
+        ViewPager viewPager = findViewById(R.id.container);
         viewPager.setAdapter(rssPagerAdapter);
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        TabLayout tabLayout = findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
         tabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
     }
@@ -148,7 +139,7 @@ public class MainActivity extends BaseActivity
 
             @Override
             public void oneChannelDone(Channel channel) {
-                rssPagerAdapter.addItem(channel);
+                rssPagerAdapter.addItemByOrder(channel);
                 Timber.d("channel loaded title  %s", channel.getTitle());
             }
 
@@ -156,6 +147,7 @@ public class MainActivity extends BaseActivity
             public void oneChannelError() {
 
             }
+
         });
     }
 
@@ -167,7 +159,7 @@ public class MainActivity extends BaseActivity
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -215,7 +207,7 @@ public class MainActivity extends BaseActivity
 
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }

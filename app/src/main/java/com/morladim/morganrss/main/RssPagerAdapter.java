@@ -4,6 +4,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
+import com.morladim.morganrss.R;
+import com.morladim.morganrss.base.RssApplication;
 import com.morladim.morganrss.base.database.entity.Channel;
 
 import java.util.List;
@@ -42,6 +44,43 @@ public class RssPagerAdapter extends FragmentStatePagerAdapter {
     public void addItem(Channel channel) {
         data.add(channel);
         notifyDataSetChanged();
+    }
+
+    /**
+     * 根据xml中存储的channel顺序加载数据
+     *
+     * @param channel 待加入的channel
+     */
+    public synchronized void addItemByOrder(Channel channel) {
+        int positionInXml = RssPagerAdapter.getChannelPositionByUrl(channel.getRequestUrl());
+        if (positionInXml < 0 || data.size() == 0) {
+            data.add(channel);
+        } else {
+            for (int i = 0, count = data.size(); i < count; i++) {
+                int j = getChannelPositionByUrl(data.get(i).getRequestUrl());
+                if (j > positionInXml) {
+                    data.add(i, channel);
+                    break;
+                }
+                if (i == count - 1) {
+                    data.add(channel);
+                }
+            }
+
+        }
+        notifyDataSetChanged();
+    }
+
+
+    private static final String[] URLS = RssApplication.getContext().getResources().getStringArray(R.array.defaultUrls);
+
+    public static int getChannelPositionByUrl(String channelUrl) {
+        for (int i = 0, count = URLS.length; i < count; i++) {
+            if (URLS[i].equals(channelUrl)) {
+                return i;
+            }
+        }
+        return -1;
     }
 
 }
