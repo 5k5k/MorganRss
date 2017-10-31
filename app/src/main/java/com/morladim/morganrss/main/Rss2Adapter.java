@@ -18,8 +18,8 @@ import com.morladim.morganrss.base.database.entity.Item;
 import com.morladim.morganrss.base.image.SingleTouchImageViewActivity;
 import com.morladim.morganrss.base.util.AppUtils;
 import com.morladim.morganrss.base.util.DateUtils;
-import com.morladim.morganrss.base.util.ImageLoader;
 import com.morladim.morganrss.base.web.WebActivity;
+import com.morladim.tools.ImageLoader;
 import com.squareup.picasso.Transformation;
 
 import java.lang.ref.SoftReference;

@@ -1,7 +1,5 @@
 package com.morladim.morganrss.main;
 
-import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -16,7 +14,7 @@ import com.morladim.morganrss.base.database.entity.Item;
 import com.morladim.morganrss.base.network.ErrorConsumer;
 import com.morladim.morganrss.base.network.NewsProvider;
 import com.morladim.morganrss.base.util.DeviceUtils;
-import com.morladim.morganrss.base.util.ImageLoader;
+import com.morladim.tools.ImageLoader;
 
 import java.util.List;
 

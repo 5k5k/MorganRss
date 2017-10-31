@@ -2,6 +2,8 @@ package com.morladim.morganrss.base.util;
 
 import android.util.Log;
 
+import com.morladim.tools.SharedPreferencesUtils;
+
 import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Consumer;
 import io.reactivex.plugins.RxJavaPlugins;
@@ -41,7 +43,7 @@ public class AppUtils {
      */
     public static boolean isNoImageMode() {
         if (noImage == null) {
-            noImage = SharedUtils.loadBoolean(NO_IMAGE);
+            noImage = SharedPreferencesUtils.loadBoolean(NO_IMAGE);
         }
         return noImage;
     }
@@ -53,7 +55,7 @@ public class AppUtils {
      */
     public static synchronized void setNoImageMode(boolean noImage) {
         AppUtils.noImage = noImage;
-        SharedUtils.saveBoolean(NO_IMAGE, noImage);
+        SharedPreferencesUtils.saveBoolean(NO_IMAGE, noImage);
     }
 
 }

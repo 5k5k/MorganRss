@@ -1,5 +1,7 @@
 package com.morladim.morganrss.base.database;
 
+import android.app.Application;
+
 import com.morladim.morganrss.base.RssApplication;
 import com.morladim.morganrss.base.database.dao.DaoMaster;
 import com.morladim.morganrss.base.database.dao.DaoSession;
@@ -21,7 +23,7 @@ class DbManager {
     private volatile static DbManager instance;
     private DaoSession daoSession;
 
-    private DbManager(RssApplication context) {
+    private DbManager(Application context) {
         DaoMaster.DevOpenHelper openHelper = new DaoMaster.DevOpenHelper(context, DB_NAME);
         DaoMaster daoMaster = new DaoMaster(openHelper.getWritableDatabase());
         daoSession = daoMaster.newSession();

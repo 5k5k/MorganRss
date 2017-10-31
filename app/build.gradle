@@ -47,6 +47,7 @@ greendao {
 }
 
 dependencies {
+
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
@@ -54,6 +55,9 @@ dependencies {
     implementation 'com.android.support:appcompat-v7:' + supportVersion
     implementation 'com.android.support:support-v4:' + supportVersion
     implementation 'com.android.support:design:' + supportVersion
+
+    implementation 'com.morladim:tools:0.0.15'
+
     //百分比布局
     implementation 'com.android.support:percent:' + supportVersion
 
@@ -72,18 +76,15 @@ dependencies {
     implementation 'com.squareup.okhttp3:logging-interceptor:3.8.1'
     implementation 'org.greenrobot:greendao:3.2.2'
     implementation 'com.github.dkzwm:SmoothRefreshLayout:1.3.3'
-    implementation 'com.squareup.picasso:picasso:2.5.2'
+//    implementation 'com.squareup.picasso:picasso:2.5.2'
     implementation 'com.google.android:flexbox:0.3.0'
-    implementation 'com.google.code.gson:gson:2.8.0'
+//    implementation 'com.google.code.gson:gson:2.8.0'
     implementation 'com.github.bluejamesbond:textjustify-android:2.1.6'
 
-    implementation 'com.facebook.stetho:stetho:1.5.0'
-    implementation 'com.facebook.stetho:stetho-okhttp3:1.5.0'
-
     testImplementation 'junit:junit:4.12'
+    //内存泄漏
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.5.4'
     releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.4'
 
-    implementation 'com.morladim:tools:0.0.2'
-    implementation 'org.jetbrains:annotations-java5:15.0'
+//    implementation 'org.jetbrains:annotations-java5:15.0'
 }

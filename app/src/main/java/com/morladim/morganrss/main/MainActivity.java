@@ -19,8 +19,8 @@ import com.morladim.morganrss.base.database.ChannelManager;
 import com.morladim.morganrss.base.database.entity.Channel;
 import com.morladim.morganrss.base.ui.BaseActivity;
 import com.morladim.morganrss.base.util.AppUtils;
-import com.morladim.morganrss.base.util.NetworkUtils;
 import com.morladim.morganrss.base.util.SnackbarHolder;
+import com.morladim.tools.NetworkUtils;
 
 import java.util.ArrayList;
 import java.util.List;

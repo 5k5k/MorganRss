@@ -4,7 +4,7 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.morladim.morganrss.base.util.SharedUtils;
+import com.morladim.tools.SharedPreferencesUtils;
 
 import java.io.IOException;
 
@@ -27,7 +27,7 @@ class CookieInterceptor implements Interceptor {
         String cookie = response.header("Set-Cookie");
         if (!TextUtils.isEmpty(cookie)) {
             Log.d("url + cookie", request.url() + " " + cookie);
-            SharedUtils.saveString(request.url() + COOKIE, cookie);
+            SharedPreferencesUtils.saveString(request.url() + COOKIE, cookie);
         }
         return response;
     }
