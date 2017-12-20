@@ -72,7 +72,7 @@ public class RssPagerAdapter extends FragmentStatePagerAdapter {
     }
 
 
-    private static final String[] URLS = RssApplication.getContext().getResources().getStringArray(R.array.defaultUrls);
+    private static final String[] URLS = RssApplication.getContext().getResources().getStringArray(R.array.default_urls);
 
     public static int getChannelPositionByUrl(String channelUrl) {
         for (int i = 0, count = URLS.length; i < count; i++) {

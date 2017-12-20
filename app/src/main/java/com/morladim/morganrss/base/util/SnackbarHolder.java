@@ -24,10 +24,10 @@ import static android.support.design.widget.Snackbar.SnackbarLayout;
 @SuppressWarnings("unused")
 public enum SnackbarHolder {
 
-    INFO(R.color.snackbarBackgroundInfo, R.color.snackbarTextInfo, R.drawable.ic_error_outline_black_24dp, null),
-    WARNING(R.color.snackbarBackgroundWarn, R.color.snackbarTextWarn, R.drawable.ic_priority_high_black_24dp, null),
-    ERROR(R.color.snackbarBackgroundError, R.color.snackbarTextError, R.drawable.ic_highlight_off_black_24dp, "遇到错误"),
-    SUCCESS(R.color.snackbarBackgroundSuccess, R.color.snackbarTextSuccess, R.drawable.ic_done_black_24dp, "操作成功");
+    INFO(R.color.snackbar_info_bg, R.color.snackbar_info_text, R.drawable.ic_error_outline_black_24dp, null),
+    WARNING(R.color.snackbar_warn_bg, R.color.snackbar_warn_text, R.drawable.ic_priority_high_black_24dp, null),
+    ERROR(R.color.snackbar_error_bg, R.color.snackbar_error_text, R.drawable.ic_highlight_off_black_24dp, "遇到错误"),
+    SUCCESS(R.color.snackbar_success_bg, R.color.snackbar_success_text, R.drawable.ic_done_black_24dp, "操作成功");
 
     private int bgColorId, textColorId, iconId;
     private String text;

@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!--<color name="colorPrimary">#3F51B5</color>-->
-    <!--<color name="colorPrimaryDark">#303F9F</color>-->
-    <!--<color name="colorAccent">#FF4081</color>-->
-    <color name="colorPrimary">#455a64</color>
-    <color name="colorPrimaryDark">#263238</color>
-    <color name="colorAccent">#ff5177</color>
+    <!-- 单词间下划线分隔 -->
+    <!-- 主要颜色 -->
+    <color name="color_primary">#455a64</color>
+    <color name="color_primary_dark">#263238</color>
+    <color name="color_accent">#ff5177</color>
     <color name="transparent">#00000000</color>
 
-    <!-- snackbar -->
-    <color name="snackbarBackgroundInfo">#BFEFFF</color>
-    <color name="snackbarTextInfo">#4D4D4D</color>
-    <color name="snackbarBackgroundWarn">#DAA520</color>
-    <color name="snackbarTextWarn">#4D4D4D</color>
-    <color name="snackbarBackgroundError">#EE3B3B</color>
-    <color name="snackbarTextError">#FCFCFC</color>
-    <color name="snackbarBackgroundSuccess">#388E3C</color>
-    <color name="snackbarTextSuccess">#FCFCFC</color>
+    <!-- snackbar颜色，不在style中使用所以没有以颜色名命名 -->
+    <color name="snackbar_info_bg">#BFEFFF</color>
+    <color name="snackbar_info_text">#4D4D4D</color>
+    <color name="snackbar_warn_bg">#DAA520</color>
+    <color name="snackbar_warn_text">#4D4D4D</color>
+    <color name="snackbar_error_bg">#EE3B3B</color>
+    <color name="snackbar_error_text">#FCFCFC</color>
+    <color name="snackbar_success_bg">#388E3C</color>
+    <color name="snackbar_success_text">#FCFCFC</color>
+
 
 </resources>

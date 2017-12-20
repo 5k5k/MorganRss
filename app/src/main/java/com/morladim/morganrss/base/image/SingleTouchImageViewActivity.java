@@ -66,7 +66,7 @@ public class SingleTouchImageViewActivity extends Activity {
     private void initWindow() {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_single_touch_image_view);
-        getWindow().setStatusBarColor(ContextCompat.getColor(RssApplication.getContext(), R.color.colorPrimaryDark));
+        getWindow().setStatusBarColor(ContextCompat.getColor(RssApplication.getContext(), R.color.color_primary_dark));
     }
 
     /**

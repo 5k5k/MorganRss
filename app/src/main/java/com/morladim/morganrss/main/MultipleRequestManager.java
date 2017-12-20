@@ -53,7 +53,7 @@ public class MultipleRequestManager {
      * @param generateChannelsListener 回调
      */
     public synchronized void generateChannels(final GenerateChannelsListener generateChannelsListener) {
-        String[] urls = RssApplication.getContext().getResources().getStringArray(R.array.defaultUrls);
+        String[] urls = RssApplication.getContext().getResources().getStringArray(R.array.default_urls);
         generateChannelsByArray(urls, generateChannelsListener);
     }
 
