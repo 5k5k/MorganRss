@@ -15,7 +15,7 @@ import android.widget.ImageView;
 
 import com.morladim.morganrss.R;
 import com.morladim.morganrss.base.RssApplication;
-import com.morladim.tools.ImageLoader;
+import com.morladim.morganrss.base.util.ImageLoader;
 import com.squareup.picasso.Callback;
 
 /**

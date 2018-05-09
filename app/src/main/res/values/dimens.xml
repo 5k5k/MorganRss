@@ -17,5 +17,7 @@
 
     <!-- 高度 -->
     <dimen name="nav_header_height">160dp</dimen>
+    <!-- 閃屏頁圖標下偏移-->
+    <dimen name="splash_icon_margin_bottom">256dp</dimen>
 
 </resources>

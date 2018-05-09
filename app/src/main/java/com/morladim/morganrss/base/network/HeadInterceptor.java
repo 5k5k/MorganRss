@@ -2,7 +2,7 @@ package com.morladim.morganrss.base.network;
 
 import android.support.annotation.NonNull;
 
-import com.morladim.tools.SharedPreferencesUtils;
+import com.morladim.morganrss.base.util.SharedPreferencesUtils;
 
 import java.io.IOException;
 

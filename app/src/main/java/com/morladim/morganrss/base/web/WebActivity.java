@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.PersistableBundle;
+import android.support.annotation.Nullable;
 
 import com.morladim.morganrss.R;
 
@@ -55,6 +57,8 @@ public class WebActivity extends Activity {
         noImage = getIntent().getBooleanExtra(NO_IMAGE, false);
         content = getIntent().getStringExtra(CONTENT);
         if (noImage) {
+            getFragmentManager().beginTransaction().replace(R.id.content_web, WebFragment.newInstance(content)).commit();
+// TODO: 2018/5/7 要做無圖處理
         } else {
             getFragmentManager().beginTransaction().replace(R.id.content_web, WebFragment.newInstance(content)).commit();
 

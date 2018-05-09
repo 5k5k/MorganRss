@@ -33,4 +33,24 @@
         </menu>
     </item>
 
+    <item android:title="加載圖片">
+        <menu>
+            <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/load_only_wifi"
+                    android:checkable="true"
+                    android:title="僅wifi下加載" />
+                <item
+                    android:id="@+id/always_load"
+                    android:checkable="true"
+                    android:title="始終加載" />
+                <item
+                    android:id="@+id/always_not_load"
+                    android:checkable="true"
+                    android:title="始終不加載" />
+            </group>
+        </menu>
+
+    </item>
+
 </menu>

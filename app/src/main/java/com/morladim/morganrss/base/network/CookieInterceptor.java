@@ -4,7 +4,7 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.morladim.tools.SharedPreferencesUtils;
+import com.morladim.morganrss.base.util.SharedPreferencesUtils;
 
 import java.io.IOException;
 

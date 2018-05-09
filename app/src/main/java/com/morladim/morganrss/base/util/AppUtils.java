@@ -2,8 +2,6 @@ package com.morladim.morganrss.base.util;
 
 import android.util.Log;
 
-import com.morladim.tools.SharedPreferencesUtils;
-
 import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Consumer;
 import io.reactivex.plugins.RxJavaPlugins;

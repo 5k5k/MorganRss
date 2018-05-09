@@ -14,7 +14,7 @@ import com.morladim.morganrss.base.database.entity.Item;
 import com.morladim.morganrss.base.network.ErrorConsumer;
 import com.morladim.morganrss.base.network.NewsProvider;
 import com.morladim.morganrss.base.util.DeviceUtils;
-import com.morladim.tools.ImageLoader;
+import com.morladim.morganrss.base.util.ImageLoader;
 
 import java.util.List;
 
