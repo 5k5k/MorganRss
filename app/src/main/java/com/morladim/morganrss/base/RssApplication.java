@@ -27,7 +27,6 @@ public class RssApplication extends Application {
     public void onCreate() {
         super.onCreate();
         context = this;
-
         //圖片進程初始化工具類
         if (PICTURE_PROCESS_NAME.equals(getProcessName())) {
             initPictureProcess(this);

@@ -60,6 +60,16 @@ public class Channel {
      */
     private Date updateAt;
 
+    @Override
+    public int hashCode() {
+        return ((id == null ? "" : id) + (requestUrl == null ? "" : requestUrl)).hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof Channel && (id != null && id.equals(((Channel) obj).id) || requestUrl != null && requestUrl.equals(((Channel) obj).requestUrl));
+    }
+
     public long getOrderInCurrentGroup() {
         return orderInCurrentGroup;
     }

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Application;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
@@ -20,12 +21,14 @@ import com.morladim.morganrss.base.database.ChannelManager;
 import com.morladim.morganrss.base.database.entity.Channel;
 import com.morladim.morganrss.base.database.entity.ChannelGroup;
 import com.morladim.morganrss.base.database.entity.ChannelJoinGroup;
+import com.morladim.morganrss.base.image.ImageService;
 import com.morladim.morganrss.base.util.ImageLoader;
 import com.morladim.morganrss.base.util.MorladimDebugTree;
 import com.morladim.morganrss.base.util.NetworkUtils;
 import com.morladim.morganrss.base.util.SharedPreferencesUtils;
 import com.morladim.morganrss.base.util.SnackbarUtils;
 import com.morladim.morganrss.base.util.StringUtils;
+import com.morladim.morganrss.base.web.WebService;
 import com.squareup.leakcanary.LeakCanary;
 
 import java.util.ArrayList;
@@ -48,15 +51,17 @@ import timber.log.Timber;
  */
 public class SplashActivity extends Activity implements AddChannelDialogFragment.Callback {
 
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //加載數據
         disposable = Observable.create(new ObservableOnSubscribe<Integer>() {
             @Override
-            public void subscribe(ObservableEmitter<Integer> e) throws Exception {
+            public void subscribe(ObservableEmitter<Integer> e) {
+                //加載數據
                 initApplicationData(RssApplication.getContext());
+                //啟動其他進程
+                startService(new Intent(SplashActivity.this, ImageService.class));
+                startService(new Intent(SplashActivity.this, WebService.class));
                 e.onNext(ChannelManager.getInstance().getAll().size());
                 e.onComplete();
             }
@@ -64,7 +69,7 @@ public class SplashActivity extends Activity implements AddChannelDialogFragment
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<Integer>() {
                     @Override
-                    public void accept(Integer integer) throws Exception {
+                    public void accept(Integer integer) {
                         //沒有任何頻道設定時，提示用戶是否載入默認頻道
                         if (integer == 0) {
                             showLoadDataDialog();
@@ -85,13 +90,10 @@ public class SplashActivity extends Activity implements AddChannelDialogFragment
         ImageLoader.init(application);
         NetworkUtils.init(application);
         StringUtils.init(application);
-        //chrome://inspect
         Stetho.initializeWithDefaults(application);
-
         if (BuildConfig.DEBUG) {
             Timber.plant(new MorladimDebugTree());
         }
-
         if (LeakCanary.isInAnalyzerProcess(application)) {
             return;
         }
@@ -107,10 +109,6 @@ public class SplashActivity extends Activity implements AddChannelDialogFragment
         }
         if (fragment != null) {
             fragment.setCallback(null);
-        }
-        disposable.dispose();
-        if (saveDisposable != null) {
-            saveDisposable.dispose();
         }
         MainActivity.start(this);
         finish();
@@ -158,7 +156,7 @@ public class SplashActivity extends Activity implements AddChannelDialogFragment
     private void saveDefaultData() {
         saveDisposable = Observable.create(new ObservableOnSubscribe<Boolean>() {
             @Override
-            public void subscribe(ObservableEmitter<Boolean> e) throws Exception {
+            public void subscribe(ObservableEmitter<Boolean> e) {
                 ChannelGroup channelGroup = new ChannelGroup();
                 channelGroup.setName(getString(R.string.default_group));
                 channelGroup.setSelected(true);
@@ -194,81 +192,35 @@ public class SplashActivity extends Activity implements AddChannelDialogFragment
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<Boolean>() {
                     @Override
-                    public void accept(Boolean aBoolean) throws Exception {
+                    public void accept(Boolean aBoolean) {
                         startMainActivity();
                     }
                 });
-
-//        //分組id
-//        Observable<Long> channelGroupObservable = Observable.create(new ObservableOnSubscribe<Long>() {
-//
-//            @Override
-//            public void subscribe(ObservableEmitter<Long> e) throws Exception {
-//                ChannelGroup channelGroup = new ChannelGroup();
-//                channelGroup.setName(getString(R.string.default_group));
-//                channelGroup.setSelected(true);
-//                channelGroup.setDescription(getString(R.string.default_group_description));
-//                channelGroup.setOrder(ChannelGroupManager.getInstance().getMaxOrder());
-//                ChannelGroupManager.getInstance().insert(channelGroup);
-//                e.onNext(channelGroup.getId());
-//                e.onComplete();
-//            }
-//        });
-//
-//        //頻道列表
-//        Observable<List<Channel>> channelsObservable = Observable.create(new ObservableOnSubscribe<String[]>() {
-//
-//            @Override
-//            public void subscribe(ObservableEmitter<String[]> e) throws Exception {
-//                String[] urls = StringUtils.getStringArrayById(R.array.default_urls);
-//                e.onNext(urls);
-//                e.onComplete();
-//            }
-//        }).concatMap(new Function<String[], ObservableSource<String>>() {
-//            @Override
-//            public ObservableSource<String> apply(String[] strings) throws Exception {
-//                return Observable.fromArray(strings);
-//            }
-//        }).map(new Function<String, Channel>() {
-//            @Override
-//            public Channel apply(String s) throws Exception {
-//                Channel channel = new Channel();
-//                channel.setRequestUrl(s);
-//                return channel;
-//            }
-//        }).toList().toObservable();
-//
-//        //存入關聯表
-//        saveDisposable = Observable.combineLatest(channelGroupObservable, channelsObservable, new BiFunction<Long, List<Channel>, Boolean>() {
-//            @Override
-//            public Boolean apply(Long channelGroupId, List<Channel> channelList) throws Exception {
-//                ChannelManager.getInstance().insertInTx(channelList);
-//                long begin = ChannelJoinGroupManager.getInstance().getMaxOrder();
-//                List<ChannelJoinGroup> channelJoinGroupList = new ArrayList<>(channelList.size());
-//                for (int i = 0; i < channelList.size(); i++) {
-//                    ChannelJoinGroup join = new ChannelJoinGroup();
-//                    join.setChannelGroupId(channelGroupId);
-//                    join.setChannelId(channelList.get(i).getId());
-//                    join.setOrder(begin + i);
-//                    channelJoinGroupList.add(join);
-//                }
-//                ChannelJoinGroupManager.getInstance().insertInTx(channelJoinGroupList);
-//                Thread.sleep(25000);
-//                return true;
-//            }
-//        }).subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(new Consumer<Boolean>() {
-//                    @Override
-//                    public void accept(Boolean aBoolean) throws Exception {
-//                        startMainActivity();
-//                    }
-//                });
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (disposable != null) {
+            disposable.dispose();
+        }
+        if (saveDisposable != null) {
+            saveDisposable.dispose();
+        }
+    }
+
+    @Override
+    public void onDone() {
+        startMainActivity();
+    }
+
+    @Override
+    public void onFailed(String message) {
+        // TODO: 2018/5/15 此處後續修改為在dialog中進行提示
+        if (contentView == null) {
+            contentView = findViewById(android.R.id.content);
+        }
+        SnackbarUtils.showError(contentView, message);
     }
 
     /**
@@ -293,18 +245,4 @@ public class SplashActivity extends Activity implements AddChannelDialogFragment
      * 獲取是否有數據
      */
     private Disposable disposable;
-
-    @Override
-    public void onDone() {
-        startMainActivity();
-    }
-
-    @Override
-    public void onFailed(String message) {
-        // TODO: 2018/5/15 此處後續修改為在dialog中進行提示
-        if (contentView == null) {
-            contentView = findViewById(android.R.id.content);
-        }
-        SnackbarUtils.showError(contentView, message);
-    }
 }

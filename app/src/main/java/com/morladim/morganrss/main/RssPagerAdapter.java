@@ -17,10 +17,6 @@ import java.util.List;
  */
 public class RssPagerAdapter extends FragmentStatePagerAdapter {
 
-    private volatile List<Channel> data;
-
-    private HashMap<Channel, RssFragment> map;
-
     public RssPagerAdapter(FragmentManager fm, List<Channel> data) {
         super(fm);
         this.data = data;
@@ -41,7 +37,7 @@ public class RssPagerAdapter extends FragmentStatePagerAdapter {
             ((RssFragment) object).setRefresh(false);
             return POSITION_NONE;
         }
-        return super.getItemPosition(object);
+        return POSITION_UNCHANGED;
     }
 
     @Override
@@ -52,11 +48,6 @@ public class RssPagerAdapter extends FragmentStatePagerAdapter {
     @Override
     public CharSequence getPageTitle(int position) {
         return data.get(position).getTitle();
-    }
-
-    public void addItem(Channel channel) {
-        data.add(channel);
-        notifyDataSetChanged();
     }
 
     /**
@@ -71,6 +62,7 @@ public class RssPagerAdapter extends FragmentStatePagerAdapter {
             boolean add = false;
             for (int i = 0, count = data.size(); i < count; i++) {
                 if (add) {
+                    //已經加入的情況設置對應fragment刷新
                     RssFragment fragment = map.get(data.get(i));
                     if (fragment != null) {
                         fragment.setRefresh(true);
@@ -81,7 +73,6 @@ public class RssPagerAdapter extends FragmentStatePagerAdapter {
                 if (channel.getOrderInCurrentGroup() < data.get(i).getOrderInCurrentGroup()) {
                     add = true;
                     data.add(i, channel);
-//                    break;
                 }
             }
             if (!add) {
@@ -91,16 +82,13 @@ public class RssPagerAdapter extends FragmentStatePagerAdapter {
         notifyDataSetChanged();
     }
 
-//
-//    private static final String[] URLS = RssApplication.getContext().getResources().getStringArray(R.array.default_urls);
-//
-//    public static int getChannelPositionByUrl(String channelUrl) {
-//        for (int i = 0, count = URLS.length; i < count; i++) {
-//            if (URLS[i].equals(channelUrl)) {
-//                return i;
-//            }
-//        }
-//        return -1;
-//    }
+    /**
+     * 數據
+     */
+    private volatile List<Channel> data;
 
+    /**
+     * 存儲頻道和fragment的對應關係，為了設置{@link RssPagerAdapter#getItemPosition(Object)}返回值。
+     */
+    private HashMap<Channel, RssFragment> map;
 }

@@ -43,7 +43,7 @@ public class ErrorConsumer implements Consumer<Throwable> {
     public void accept(@NonNull Throwable throwable) {
         if (reference != null && reference.get() != null) {
             Timber.e(throwable);
-            Toast.makeText(RssApplication.getContext(), throwable.getMessage(), Toast.LENGTH_LONG).show();
+//            Toast.makeText(RssApplication.getContext(), throwable.getMessage(), Toast.LENGTH_LONG).show();
             SnackbarUtils.showError(reference.get(), error == null ? throwable.getMessage() : error);
         }
     }

@@ -9,6 +9,7 @@ import java.util.List;
 
 import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Consumer;
+import timber.log.Timber;
 
 /**
  * 多请求管理类
@@ -18,19 +19,6 @@ import io.reactivex.functions.Consumer;
  */
 @SuppressWarnings("WeakerAccess")
 public class MultipleRequestManager {
-
-    private static final String TAG = "MultipleRequestManager";
-
-    private static volatile MultipleRequestManager multipleRequestManager;
-
-    private static final Object obj = new Object();
-
-    //总请求数量
-    private int count;
-    //成功请求数量
-    private int successCount;
-    //请求失败数量
-    private int errorCount;
 
     private MultipleRequestManager() {
 
@@ -47,18 +35,11 @@ public class MultipleRequestManager {
         return multipleRequestManager;
     }
 
-//    /**
-//     * 生成默认频道
-//     *
-//     * @param generateChannelsListener 回调
-//     */
-//    public synchronized void generateChannels(final GenerateChannelsListener generateChannelsListener) {
-//        String[] urls = RssApplication.getContext().getResources().getStringArray(R.array.default_urls);
-//        generateChannelsByArray(urls, generateChannelsListener);
-//    }
-
-    // TODO: 2018/5/29 線程池
-    public synchronized void loadChannels(List<Channel> channelList, final GenerateChannelsListener generateChannelsListener) {
+    public void loadChannels(List<Channel> channelList, final GenerateChannelsListener generateChannelsListener) {
+        if (working) {
+            return;
+        }
+        working = true;
         count = channelList.size();
         successCount = 0;
         errorCount = 0;
@@ -66,11 +47,11 @@ public class MultipleRequestManager {
 
         NewsProvider.getChannels(channelList, new Consumer<Channel>() {
             @Override
-            public void accept(@NonNull Channel channel) throws Exception {
-                synchronized (obj) {
+            public void accept(@NonNull Channel channel) {
+                synchronized (OBJ) {
                     count--;
                     successCount++;
-                    Log.d(TAG, "generateChannels剩余" + count + "项。");
+                    Timber.d(TAG, "generateChannels剩余" + count + "项。");
                     checkDone(generateChannelsListener);
                 }
                 if (generateChannelsListener != null) {
@@ -80,10 +61,10 @@ public class MultipleRequestManager {
         }, new Consumer<Throwable>() {
             @Override
             public void accept(@NonNull Throwable throwable) throws Exception {
-                synchronized (obj) {
+                synchronized (OBJ) {
                     throwable.printStackTrace();
                     count--;
-                    Log.d(TAG, "generateChannels剩余" + count + "项，当前项错误！");
+                    Timber.d(TAG, "generateChannels剩余" + count + "项，当前项错误！");
                     errorCount++;
                     checkDone(generateChannelsListener);
                 }
@@ -92,94 +73,60 @@ public class MultipleRequestManager {
                 }
             }
         });
-
-
-//        for (Channel channel : channelList) {
-//            NewsProvider.getChannel(channel, new Consumer<Channel>() {
-//                @Override
-//                public void accept(@NonNull Channel channel) throws Exception {
-//                    synchronized (obj) {
-//                        count--;
-//                        successCount++;
-//                        Log.d(TAG, "generateChannels剩余" + count + "项。");
-//                        checkDone(generateChannelsListener);
-//                    }
-//                    if (generateChannelsListener != null) {
-//                        generateChannelsListener.oneChannelDone(channel);
-//                    }
-//                }
-//            }, new Consumer<Throwable>() {
-//                @Override
-//                public void accept(@NonNull Throwable throwable) throws Exception {
-//                    synchronized (obj) {
-//                        count--;
-//                        Log.d(TAG, "generateChannels剩余" + count + "项，当前项错误！");
-//                        errorCount++;
-//                        checkDone(generateChannelsListener);
-//                    }
-//                    if (generateChannelsListener != null) {
-//                        generateChannelsListener.oneChannelError();
-//                    }
-//                }
-//            });
-//        }
     }
-
-//    /**
-//     * 生成指定频道列表
-//     *
-//     * @param urls                     地址数组
-//     * @param generateChannelsListener 回调
-//     */
-//    public synchronized void generateChannelsByArray(String[] urls, final GenerateChannelsListener generateChannelsListener) {
-//        count = urls.length;
-//        successCount = 0;
-//        errorCount = 0;
-//        Log.d(TAG, "generateChannels开始，共有" + count + "项。");
-//        for (String url : urls) {
-//            NewsProvider.getChannel(url, new Consumer<Channel>() {
-//                @Override
-//                public void accept(@NonNull Channel channel) throws Exception {
-//                    synchronized (obj) {
-//                        count--;
-//                        successCount++;
-//                        Log.d(TAG, "generateChannels剩余" + count + "项。");
-//                        checkDone(generateChannelsListener);
-//                    }
-//                    if (generateChannelsListener != null) {
-//                        generateChannelsListener.oneChannelDone(channel);
-//                    }
-//                }
-//            }, new Consumer<Throwable>() {
-//                @Override
-//                public void accept(@NonNull Throwable throwable) throws Exception {
-//                    synchronized (obj) {
-//                        count--;
-//                        Log.d(TAG, "generateChannels剩余" + count + "项，当前项错误！");
-//                        errorCount++;
-//                        checkDone(generateChannelsListener);
-//                    }
-//                    if (generateChannelsListener != null) {
-//                        generateChannelsListener.oneChannelError();
-//                    }
-//                }
-//            });
-//        }
-//    }
 
     private void checkDone(GenerateChannelsListener generateChannelsListener) {
         if (count == 0 && generateChannelsListener != null) {
-            Log.d(TAG, "generateChannels结束，成功" + successCount + "项，失败" + errorCount + "项。");
+            Timber.d(TAG, "generateChannels结束，成功" + successCount + "项，失败" + errorCount + "项。");
             generateChannelsListener.allDone(successCount, errorCount);
+            working = false;
         }
     }
 
+    private static final String TAG = "MultipleRequestManager";
+
+    private static volatile MultipleRequestManager multipleRequestManager;
+
+    /**
+     * 鎖
+     */
+    private static final Object OBJ = new Object();
+
+    /**
+     * 总请求数量
+     */
+    private int count;
+    /**
+     * 成功请求数量D
+     */
+    private int successCount;
+    /**
+     * 请求失败数量
+     */
+    private int errorCount;
+
+    private volatile boolean working = false;
+
     interface GenerateChannelsListener {
 
+        /**
+         * 全部完成回調
+         *
+         * @param success 成功獲取數量
+         * @param error   失敗數量
+         */
         void allDone(int success, int error);
 
+        /**
+         * 一個頻道完成回調
+         *
+         * @param channel 頻道
+         */
         void oneChannelDone(Channel channel);
 
+        /**
+         * 一個頻道失敗回調
+         */
         void oneChannelError();
     }
 }

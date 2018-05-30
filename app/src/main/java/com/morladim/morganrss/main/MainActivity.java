@@ -25,6 +25,7 @@ import com.morladim.morganrss.base.util.SnackbarUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
@@ -56,11 +57,6 @@ public class MainActivity extends BaseActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initView();
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
         loadData();
     }
 
@@ -78,9 +74,7 @@ public class MainActivity extends BaseActivity
     private void initDrawer() {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
-
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
@@ -121,11 +115,6 @@ public class MainActivity extends BaseActivity
         }
     }
 
-    /**
-     * 根視圖
-     */
-    private View rootView;
-
     @SuppressLint("CheckResult")
     private void showData() {
         Observable.create(new ObservableOnSubscribe<Object>() {
@@ -148,17 +137,7 @@ public class MainActivity extends BaseActivity
                         getDataFromNet();
                     }
                 });
-
-
-//        if (list.size() == 0) {
-//        } else {
-//            initViewPager(ChannelManager.getInstance().getAll());
-//        }
-
-
     }
-
-    private TabLayout tabLayout;
 
     private void initViewPager(List<Channel> list) {
         rssPagerAdapter = new RssPagerAdapter(getSupportFragmentManager(), list);
@@ -176,6 +155,7 @@ public class MainActivity extends BaseActivity
         for (Channel channel : list) {
             if (channel.getTitle() != null) {
                 rssPagerAdapter.addItemByOrder(channel);
+                tabLayout.scrollTo((int) tabLayout.getChildAt(tabLayout.getSelectedTabPosition()).getX(), (int) tabLayout.getChildAt(tabLayout.getSelectedTabPosition()).getY());
             } else {
                 newChannelList.add(channel);
             }
@@ -184,7 +164,10 @@ public class MainActivity extends BaseActivity
         MultipleRequestManager.getInstance().loadChannels(newChannelList, new MultipleRequestManager.GenerateChannelsListener() {
             @Override
             public void allDone(int success, int error) {
-                Timber.d("channel load onDone success %s, error %s", success, error);
+                Timber.d("channel load all done success %s, error %s", success, error);
+                if (error > 0) {
+                    SnackbarUtils.showWarn(rootView, String.format(Locale.CHINA, "加載失敗%d項!", error));
+                }
             }
 
             @Override
@@ -200,12 +183,6 @@ public class MainActivity extends BaseActivity
             }
 
         });
-    }
-
-    @Override
-    protected void onDestroy() {
-//        unbindService(connection);
-        super.onDestroy();
     }
 
     @Override
@@ -242,7 +219,21 @@ public class MainActivity extends BaseActivity
         return true;
     }
 
+    /**
+     * 當前顯示的頻道列表
+     */
     private List<Channel> list;
+
+    /**
+     * 內容adapter
+     */
     private RssPagerAdapter rssPagerAdapter;
+
+    /**
+     * 根視圖
+     */
+    private View rootView;
+
+    private TabLayout tabLayout;
 
 }

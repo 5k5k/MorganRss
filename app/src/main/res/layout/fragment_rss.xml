@@ -9,7 +9,7 @@
     tools:context="com.morladim.morganrss.main.RssFragment"
     tools:showIn="@layout/app_bar_main">
 
-    <me.dkzwm.smoothrefreshlayout.SmoothRefreshLayout
+    <me.dkzwm.widget.srl.MaterialSmoothRefreshLayout
         android:id="@+id/smooth"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -21,6 +21,6 @@
 
         </android.support.v7.widget.RecyclerView>
 
-    </me.dkzwm.smoothrefreshlayout.SmoothRefreshLayout>
+    </me.dkzwm.widget.srl.MaterialSmoothRefreshLayout>
 
 </android.support.constraint.ConstraintLayout>

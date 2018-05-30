@@ -10,42 +10,29 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.morladim.morganrss.R;
+import com.morladim.morganrss.base.database.ItemManager;
 import com.morladim.morganrss.base.database.entity.Item;
 import com.morladim.morganrss.base.network.ErrorConsumer;
 import com.morladim.morganrss.base.network.NewsProvider;
 import com.morladim.morganrss.base.util.DeviceUtils;
 import com.morladim.morganrss.base.util.ImageLoader;
 
+import java.lang.ref.SoftReference;
 import java.util.List;
 
 import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Consumer;
-import me.dkzwm.smoothrefreshlayout.RefreshingListenerAdapter;
-import me.dkzwm.smoothrefreshlayout.SmoothRefreshLayout;
-import me.dkzwm.smoothrefreshlayout.extra.header.ClassicHeader;
+
+import me.dkzwm.widget.srl.RefreshingListenerAdapter;
+import me.dkzwm.widget.srl.SmoothRefreshLayout;
+import timber.log.Timber;
+
+import static me.dkzwm.widget.srl.config.Constants.MODE_SCALE;
 
 /**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link RssFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link RssFragment#newInstance} factory method to
- * create an instance of this fragment.
+ * @author morladim
  */
 public class RssFragment extends Fragment {
-    private static final String TITLE = "title";
-    private static final String URL = "url";
-    private static final String ID = "id";
-
-    private String title;
-    private String url;
-    private long id;
-
-//    private OnFragmentInteractionListener mListener;
-
-    private RecyclerView recyclerView;
-
-    private Rss2Adapter adapter;
 
     public RssFragment() {
         // Required empty public constructor
@@ -76,13 +63,12 @@ public class RssFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_rss, container, false);
     }
 
+
     @Override
     public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
-        final SmoothRefreshLayout refreshLayout = view.findViewById(R.id.smooth);
-        refreshLayout.setMode(SmoothRefreshLayout.MODE_BOTH);
-        refreshLayout.setHeaderView(new ClassicHeader(getContext()));
-
-        refreshLayout.setEnableScrollToBottomAutoLoadMore(true);
+        rootView = view;
+        refreshLayout = view.findViewById(R.id.smooth);
+        refreshLayout.setEnableAutoLoadMore(true);
         recyclerView = view.findViewById(R.id.single_recycler);
         adapter = new Rss2Adapter(DeviceUtils.getScreenWidth(getActivity()));
         recyclerView.setAdapter(adapter);
@@ -90,39 +76,41 @@ public class RssFragment extends Fragment {
         refreshLayout.setOnRefreshListener(new RefreshingListenerAdapter() {
             @Override
             public void onRefreshBegin(boolean isRefresh) {
-                // TODO: 2017/8/8 刷新声音
                 if (isRefresh) {
-                    NewsProvider.getXml(url, new Consumer<List<Item>>() {
-                        @Override
-                        public void accept(@NonNull List<Item> items) throws Exception {
-                            adapter.refresh(items);
-                            if (items != null && items.size() == adapter.getLimit()) {
-                                adapter.setOffset(adapter.getLimit());
-                                refreshLayout.setDisableLoadMore(false);
-                            } else {
-                                refreshLayout.setDisableLoadMore(true);
-                            }
-                            refreshLayout.refreshComplete();
-
+                    if (adapter.getItemCount() == 0) {
+                        //無數據時下拉刷新，先加載本地數據，若本地也無數據則從網絡獲取
+                        List<Item> items = ItemManager.getInstance().getList(id, 0, adapter.getLimit());
+                        if (items != null && items.size() != 0) {
+                            loadMore(items);
+                        } else {
+                            loadFresh();
                         }
-                    }, new ErrorConsumer(view.findViewById(R.id.content_main)), 0, adapter.getLimit());
+                    } else {
+                        //有數據時下拉刷新直接從網絡獲取
+                        loadFresh();
+                    }
                 } else {
-                    NewsProvider.getXml(url, new Consumer<List<Item>>() {
-                        @Override
-                        public void accept(@NonNull List<Item> items) throws Exception {
-                            adapter.loadMore(items);
-                            if (items != null && items.size() == adapter.getLimit()) {
-                                adapter.setOffset(adapter.getOffset() + adapter.getLimit());
-                            } else {
-                                refreshLayout.setDisableLoadMore(true);
-                            }
-                            refreshLayout.refreshComplete();
+                    //加載更多時
+                    List<Item> items = null;
+                    if (adapter.getItemCount() == 0) {
+                        items = ItemManager.getInstance().getList(id, 0, adapter.getLimit());
+                    } else {
+                        Item item = adapter.getDataAt(adapter.getItemCount() - 1);
+                        if (item != null && item.getId() != null) {
+                            items = ItemManager.getInstance().getListFrom(item.getChannelId(), item.getId(), adapter.getLimit());
                         }
-                    }, new ErrorConsumer(view.findViewById(R.id.content_main)), adapter.getOffset(), adapter.getLimit());
+                    }
+                    if (items != null && items.size() != 0) {
+                        adapter.loadMore(items);
+                        refreshLayout.setDisableLoadMore(false);
+                    } else {
+                        refreshLayout.setDisableLoadMore(true);
+                    }
+                    refreshLayout.refreshComplete();
                 }
             }
         });
-        refreshLayout.autoRefresh(false);
+        refreshLayout.autoRefresh();
         // TODO: 2017/8/11 tag picasso
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             Object tag = new Object();
@@ -140,11 +128,55 @@ public class RssFragment extends Fragment {
 
     }
 
+    private void loadMore(List<Item> items) {
+        adapter.loadMore(items);
+        if (items.size() == adapter.getLimit()) {
+            adapter.setOffset(adapter.getOffset() + adapter.getLimit());
+            refreshLayout.setDisableLoadMore(false);
+        } else {
+            refreshLayout.setDisableLoadMore(true);
+        }
+        refreshLayout.refreshComplete();
+    }
+
+    private void loadFresh() {
+        NewsProvider.getXml(url, new Consumer<List<Item>>() {
+            @Override
+            public void accept(@NonNull List<Item> items) {
+                adapter.refresh(items);
+                if (items != null && items.size() == adapter.getLimit()) {
+                    adapter.setOffset(adapter.getLimit());
+                    refreshLayout.setDisableLoadMore(false);
+                } else {
+                    refreshLayout.setDisableLoadMore(true);
+                }
+                refreshLayout.refreshComplete();
+            }
+        }, getErrorConsumer(), 0, adapter.getLimit());
+    }
+
+    private static class RssErrorConsumer extends ErrorConsumer {
+
+        private SoftReference<SmoothRefreshLayout> refreshLayoutSoftReference;
+
+        public RssErrorConsumer(View snackView, SmoothRefreshLayout refreshLayout) {
+            super(snackView);
+            refreshLayoutSoftReference = new SoftReference<>(refreshLayout);
+        }
+
+        @Override
+        public void accept(Throwable throwable) {
+            super.accept(throwable);
+            if (refreshLayoutSoftReference.get() != null) {
+                refreshLayoutSoftReference.get().refreshComplete();
+            }
+        }
+    }
+
     public String getTitle() {
         return title;
     }
 
-    private boolean refresh = true;
 
     public boolean isRefresh() {
         return refresh;
@@ -154,42 +186,33 @@ public class RssFragment extends Fragment {
         this.refresh = refresh;
     }
 
-    //    // TODO: Rename method, update argument and hook method into UI event
-//    public void onButtonPressed(Uri uri) {
-//        if (mListener != null) {
-//            mListener.onFragmentInteraction(uri);
-//        }
-//    }
+    private static final String TITLE = "title";
+    private static final String URL = "url";
+    private static final String ID = "id";
 
-//    @Override
-//    public void onAttach(Context context) {
-//        super.onAttach(context);
-//        if (context instanceof OnFragmentInteractionListener) {
-//            mListener = (OnFragmentInteractionListener) context;
-//        } else {
-//            throw new RuntimeException(context.toString()
-//                    + " must implement OnFragmentInteractionListener");
-//        }
-//    }
-//
-//    @Override
-//    public void onDetach() {
-//        super.onDetach();
-//        mListener = null;
-//    }
-//
-//    /**
-//     * This interface must be implemented by activities that contain this
-//     * fragment to allow an interaction in this fragment to be communicated
-//     * to the activity and potentially other fragments contained in that
-//     * activity.
-//     * <p>
-//     * See the Android Training lesson <a href=
-//     * "http://developer.android.com/training/basics/fragments/communicating.html"
-//     * >Communicating with Other Fragments</a> for more information.
-//     */
-//    public interface OnFragmentInteractionListener {
-//        // TODO: Update argument type and name
-//        void onFragmentInteraction(Uri uri);
-//    }
+    private String title;
+    private String url;
+    private long id;
+
+    private RecyclerView recyclerView;
+
+    private SmoothRefreshLayout refreshLayout;
+
+    private Rss2Adapter adapter;
+
+    private View rootView;
+
+    private RssErrorConsumer errorConsumer;
+
+    private RssErrorConsumer getErrorConsumer() {
+        if (errorConsumer == null) {
+            return errorConsumer = new RssErrorConsumer(rootView, refreshLayout);
+        }
+        return errorConsumer;
+    }
+
+    /**
+     * 標識是否在中刷新{@link RssPagerAdapter#getItemPosition(Object)}
+     */
+    private boolean refresh = false;
 }

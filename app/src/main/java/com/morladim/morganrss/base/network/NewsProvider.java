@@ -57,60 +57,60 @@ public class NewsProvider {
                 .subscribe(onNext, onError);
     }
 
-    /**
-     * 通過rss獲取頻道信息
-     *
-     * @param channel 頻道
-     * @param onNext  回調
-     * @param onError 回調
-     */
-    public static void getChannel(final Channel channel, Consumer<Channel> onNext, Consumer<Throwable> onError) {
-        RssHttpClient.getNewsApi().getXml(channel.getRequestUrl())
-                .map(new Function<Rss2Xml, Channel>() {
-
-                    @Override
-                    public Channel apply(@NonNull Rss2Xml rss2Xml) throws Exception {
-                        String version = rss2Xml.version;
-                        if (version != null) {
-                            long versionId = RssVersionManager.getInstance().insertOrUpdate(version);
-                            Rss2Channel rss2Channel = rss2Xml.channel;
-
-                            if (TextUtils.isEmpty(rss2Channel.title) || rss2Channel.linkList == null) {
-                                return null;
-                            }
-
-                            String linkUrl = null;
-                            String atomLinkUrl = null;
-                            for (Link link : rss2Channel.linkList) {
-                                if (link.value != null) {
-                                    linkUrl = link.value;
-                                }
-                                if (link.href != null) {
-                                    atomLinkUrl = link.href;
-                                }
-                            }
-                            channel.setTitle(rss2Channel.title);
-                            channel.setLink(linkUrl);
-                            channel.setAtomLink(atomLinkUrl);
-                            channel.setDescription(rss2Channel.description);
-                            channel.setImageUrl(rss2Channel.image == null ? null : rss2Channel.image.url);
-                            channel.setImageLink(rss2Channel.image == null ? null : rss2Channel.image.link);
-                            channel.setLastBuildDate(rss2Channel.lastBuildDate);
-                            channel.setRssVersionId(versionId);
-
-                            channel.setUpdateAt(new Date());
-                            channel.setTimes(channel.getTimes() == null ? 1 : channel.getTimes() + 1);
-
-                            ChannelManager.getInstance().update(channel);
-                            return channel;
-                        }
-                        return null;
-                    }
-                }).retry(RETRY_TIMES)
-                .subscribeOn(Schedulers.from(RequestPool.getInstance()))
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(onNext, onError);
-    }
+//    /**
+//     * 通過rss獲取頻道信息
+//     *
+//     * @param channel 頻道
+//     * @param onNext  回調
+//     * @param onError 回調
+//     */
+//    public static void getChannel(final Channel channel, Consumer<Channel> onNext, Consumer<Throwable> onError) {
+//        RssHttpClient.getNewsApi().getXml(channel.getRequestUrl())
+//                .map(new Function<Rss2Xml, Channel>() {
+//
+//                    @Override
+//                    public Channel apply(@NonNull Rss2Xml rss2Xml) throws Exception {
+//                        String version = rss2Xml.version;
+//                        if (version != null) {
+//                            long versionId = RssVersionManager.getInstance().insertOrUpdate(version);
+//                            Rss2Channel rss2Channel = rss2Xml.channel;
+//
+//                            if (TextUtils.isEmpty(rss2Channel.title) || rss2Channel.linkList == null) {
+//                                return null;
+//                            }
+//
+//                            String linkUrl = null;
+//                            String atomLinkUrl = null;
+//                            for (Link link : rss2Channel.linkList) {
+//                                if (link.value != null) {
+//                                    linkUrl = link.value;
+//                                }
+//                                if (link.href != null) {
+//                                    atomLinkUrl = link.href;
+//                                }
+//                            }
+//                            channel.setTitle(rss2Channel.title);
+//                            channel.setLink(linkUrl);
+//                            channel.setAtomLink(atomLinkUrl);
+//                            channel.setDescription(rss2Channel.description);
+//                            channel.setImageUrl(rss2Channel.image == null ? null : rss2Channel.image.url);
+//                            channel.setImageLink(rss2Channel.image == null ? null : rss2Channel.image.link);
+//                            channel.setLastBuildDate(rss2Channel.lastBuildDate);
+//                            channel.setRssVersionId(versionId);
+//
+//                            channel.setUpdateAt(new Date());
+//                            channel.setTimes(channel.getTimes() == null ? 1 : channel.getTimes() + 1);
+//
+//                            ChannelManager.getInstance().update(channel);
+//                            return channel;
+//                        }
+//                        return null;
+//                    }
+//                }).retry(RETRY_TIMES)
+//                .subscribeOn(Schedulers.from(RequestPool.getInstance()))
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(onNext, onError);
+//    }
 
     /**
      * 獲取所有頻道，此處有背壓問題
@@ -122,7 +122,6 @@ public class NewsProvider {
     public static void getChannels(final List<Channel> channels, final Consumer<Channel> onNext, final Consumer<Throwable> onError) {
 
         Flowable.fromArray(channels.toArray(new Channel[channels.size()])).
-
                 map(new Function<Channel, Object>() {
                     @Override
                     public Object apply(final Channel channel) {
@@ -158,11 +157,11 @@ public class NewsProvider {
                                             channel.setImageLink(rss2Channel.image == null ? null : rss2Channel.image.link);
                                             channel.setLastBuildDate(rss2Channel.lastBuildDate);
                                             channel.setRssVersionId(versionId);
-
                                             channel.setUpdateAt(new Date());
                                             channel.setTimes(channel.getTimes() == null ? 1 : channel.getTimes() + 1);
 
                                             ChannelManager.getInstance().update(channel);
+                                            ItemManager.getInstance().insertOrUpdateList(rss2Channel.itemList, channel.getId());
                                             return channel;
                                         }
                                         return null;

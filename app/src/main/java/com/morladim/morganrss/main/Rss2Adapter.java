@@ -137,6 +137,13 @@ public class Rss2Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         return data.size();
     }
 
+    public Item getDataAt(int position) {
+        if (data != null && position < data.size()) {
+            return data.get(position);
+        }
+        return null;
+    }
+
     public void refresh(List<Item> items) {
         offset = 0;
         data.clear();

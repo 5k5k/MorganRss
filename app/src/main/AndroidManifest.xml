@@ -26,7 +26,7 @@
         <service
             android:name=".base.image.ImageService"
             android:enabled="true"
-            android:exported="true"
+            android:exported="false"
             android:process=":picture" />
 
         <activity
@@ -45,6 +45,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service
+            android:name=".base.web.WebService"
+            android:enabled="true"
+            android:exported="false"
+            android:process=":web" />
     </application>
 
 </manifest>
