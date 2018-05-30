@@ -84,4 +84,23 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <!-- 閃屏頁加載數據對話框 -->
+    <string name="splash_load_data_dialog_title">加載數據</string>
+    <string name="splash_load_data_dialog_message">當前未錄入頻道，是否加載推薦數據？</string>
+    <string name="splash_load_data_dialog_positive">加載</string>
+    <string name="splash_load_data_dialog_negative">不要</string>
+
+    <!-- 頻道管理相關 -->
+    <string name="channel_url_hint">輸入新頻道地址</string>
+    <string name="add_channel_group_hint">輸入新頻道分組名稱</string>
+    <string name="add_channel">增加頻道</string>
+    <string name="add">增加</string>
+    <string name="cancel">取消</string>
+    <string name="add_channel_incorrect_url">頻道地址格式不正確！</string>
+    <string name="add_channel_group_name_null">頻道分組名稱不能為空！</string>
+    <string name="default_group">默認分組</string>
+    <string name="default_group_description">系統默認推薦的頻道分組列表。</string>
+
+
 </resources>

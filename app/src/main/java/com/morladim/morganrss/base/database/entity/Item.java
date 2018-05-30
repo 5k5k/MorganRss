@@ -27,7 +27,7 @@ import java.util.List;
 @Entity
 public class Item {
 
-    @Id
+    @Id(autoincrement = true)
     private Long id;
 
     private String title;

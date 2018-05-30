@@ -6,7 +6,7 @@
         <item>网络响应失败！</item>
     </string-array>
 
-    <!-- 默认订阅地址 -->
+    <!-- 默认推薦订阅地址 -->
     <string-array name="default_urls">
         <item>http://www.appinn.com/feed</item>
         <item>https://www.zhihu.com/rss</item>

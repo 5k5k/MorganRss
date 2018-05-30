@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 /**
+ * Fragment基類
  * <br>创建时间：2017/10/20.
  *
  * @author morladim

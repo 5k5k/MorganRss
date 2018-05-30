@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
+import org.greenrobot.greendao.annotation.Transient;
 
 import java.util.Date;
 
@@ -12,14 +13,15 @@ import static com.morladim.morganrss.base.database.DBUtils.convertStringToDate;
 
 /**
  * 因为要对item进行分页，所以不toMany item。
- * Created on 2017/7/15 下午12:19 <p>
- * by morladim.
+ * <br>Created on 2017/7/15 下午12:19
+ *
+ * @author morladim.
  */
 @SuppressWarnings("unused")
 @Entity
 public class Channel {
 
-    @Id
+    @Id(autoincrement = true)
     private Long id;
 
     private String title;
@@ -35,6 +37,9 @@ public class Channel {
     private String atomLink;
 
     private String requestUrl;
+
+    @Transient
+    private long orderInCurrentGroup;
 
     /**
      * 请求次数
@@ -54,6 +59,14 @@ public class Channel {
      * 插入数据库时间
      */
     private Date updateAt;
+
+    public long getOrderInCurrentGroup() {
+        return orderInCurrentGroup;
+    }
+
+    public void setOrderInCurrentGroup(long orderInCurrentGroup) {
+        this.orderInCurrentGroup = orderInCurrentGroup;
+    }
 
     public void setLastBuildDate(String lastBuildDate) {
         if (TextUtils.isEmpty(lastBuildDate)) {
@@ -175,9 +188,9 @@ public class Channel {
 
     @Generated(hash = 674873480)
     public Channel(Long id, String title, String description, String imageUrl,
-            String imageLink, String link, String atomLink, String requestUrl,
-            Integer times, Date lastBuildDate, Long rssVersionId, Date createAt,
-            Date updateAt) {
+                   String imageLink, String link, String atomLink, String requestUrl,
+                   Integer times, Date lastBuildDate, Long rssVersionId, Date createAt,
+                   Date updateAt) {
         this.id = id;
         this.title = title;
         this.description = description;

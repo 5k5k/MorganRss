@@ -30,15 +30,15 @@ public class RssApplication extends Application {
 
         //圖片進程初始化工具類
         if (PICTURE_PROCESS_NAME.equals(getProcessName())) {
-            initPictureProcess();
+            initPictureProcess(this);
         }
     }
 
     /**
      * 初始化圖片進程工具及數據
      */
-    private void initPictureProcess() {
-        ImageLoader.init(this);
+    private void initPictureProcess(Application application) {
+        ImageLoader.init(application);
     }
 
     /**
@@ -56,6 +56,14 @@ public class RssApplication extends Application {
         } catch (Exception e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    @Override
+    public void onTerminate() {
+        super.onTerminate();
+        if (PICTURE_PROCESS_NAME.equals(getProcessName())) {
+            initPictureProcess(null);
         }
     }
 }

@@ -17,6 +17,7 @@ import static com.morladim.morganrss.base.network.Constants.WRITE_TIME_OUT;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 /**
+ * Retrofit封裝
  * <br>创建时间：2017/7/20.
  *
  * @author morladim

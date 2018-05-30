@@ -7,7 +7,7 @@ import org.greenrobot.greendao.annotation.Id;
 import java.util.Date;
 
 /**
- * item绑定标签类
+ * item绑定标签类，多對多關係表
  * <br>创建时间：2017/7/17.
  *
  * @author morladim
@@ -16,7 +16,7 @@ import java.util.Date;
 @Entity
 public class ItemJoinCategory {
 
-    @Id
+    @Id(autoincrement = true)
     private Long id;
 
     private Long itemId;

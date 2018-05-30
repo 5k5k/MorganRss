@@ -5,19 +5,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 
 /**
+ * Activity基類
  * <br>创建时间：2017/10/17.
  *
  * @author morladim
  */
 @SuppressWarnings("unused")
-public class BaseActivity extends AppCompatActivity {
-
-    /**
-     * 上次触摸时间
-     */
-    private long lastClickTime;
-
-    private boolean interceptDoubleClick = true;
+public abstract class BaseActivity extends AppCompatActivity {
 
     /**
      * 是否拦截双击事件
@@ -37,17 +31,12 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
         if (ev.getAction() == MotionEvent.ACTION_DOWN) {
-            if (isFastClick() && interceptDoubleClick) {
+            if (interceptDoubleClick && isFastClick()) {
                 return true;
             }
         }
         return super.dispatchTouchEvent(ev);
     }
-
-    /**
-     * activity中连续点击时间间隔，单位毫秒
-     */
-    public static final int DISPATCH_DURATION = 200;
 
     /**
      * 是否连续点击
@@ -64,4 +53,19 @@ public class BaseActivity extends AppCompatActivity {
             return false;
         }
     }
+
+    /**
+     * 上次触摸时间
+     */
+    private long lastClickTime;
+
+    /**
+     * 打斷雙擊事件
+     */
+    private boolean interceptDoubleClick = false;
+
+    /**
+     * activity中连续点击时间间隔，单位毫秒
+     */
+    public static final int DISPATCH_DURATION = 200;
 }

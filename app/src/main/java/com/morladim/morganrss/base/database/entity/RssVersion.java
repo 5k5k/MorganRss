@@ -7,14 +7,15 @@ import org.greenrobot.greendao.annotation.Id;
 import java.util.Date;
 
 /**
- * Created on 2017/7/15 下午12:22 <p>
- * by morladim.
+ * <br>Created on 2017/7/15 下午12:22 <p>
+ *
+ * @author morladim.
  */
 @SuppressWarnings("unused")
 @Entity
 public class RssVersion {
 
-    @Id
+    @Id(autoincrement = true)
     private Long id;
 
     private String name;

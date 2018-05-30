@@ -16,7 +16,7 @@ import java.util.Date;
 @Entity
 public class Category {
 
-    @Id
+    @Id(autoincrement = true)
     private Long id;
 
     private String name;

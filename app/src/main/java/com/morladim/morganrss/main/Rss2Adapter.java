@@ -89,7 +89,8 @@ public class Rss2Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             final Rss2DefaultViewHolder rss2DefaultViewHolder = (Rss2DefaultViewHolder) holder;
             final Item item = data.get(position);
             rss2DefaultViewHolder.title.setText(item.getTitle());
-            String description = item.getDescription().replaceAll("<img.+?>", "");
+            String description = item.getDescription() == null ? "" : item.getDescription();
+            description = description.replaceAll("<img.+?>", "");
 //            description = description.replaceAll("<(?<style>[^\\s>]+)[^>]*>(.|\\n)*?</\\k<style>>", "");
             // TODO: 2017/8/9 适配好奇心日报
             while (description.startsWith("\n")) {
@@ -269,7 +270,7 @@ public class Rss2Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         public void onClick(View view) {
             synchronized (OnImageClickListener.class) {
                 if (holderSoftReference != null && holderSoftReference.get() != null) {
-                    WebActivity.startNewActivity(holderSoftReference.get().title.getContext(), AppUtils.isNoImageMode(), content);
+                    WebActivity.startNewActivity(holderSoftReference.get().title.getContext(), AppUtils.loadImage(), content);
                 }
             }
         }

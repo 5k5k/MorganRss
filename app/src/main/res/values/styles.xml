@@ -14,6 +14,11 @@
         <item name="android:windowBackground">@android:color/transparent</item>
     </style>
 
+    <!--&lt;!&ndash; 有標題對話框 &ndash;&gt;-->
+    <!--<style name="TitleDialog" parent="@style/Theme.AppCompat.Light.Dialog">-->
+        <!--<item name="android:windowNoTitle">false</item>-->
+    <!--</style>-->
+
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />

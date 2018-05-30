@@ -81,6 +81,12 @@ public class RssFragment extends Fragment {
         final SmoothRefreshLayout refreshLayout = view.findViewById(R.id.smooth);
         refreshLayout.setMode(SmoothRefreshLayout.MODE_BOTH);
         refreshLayout.setHeaderView(new ClassicHeader(getContext()));
+
+        refreshLayout.setEnableScrollToBottomAutoLoadMore(true);
+        recyclerView = view.findViewById(R.id.single_recycler);
+        adapter = new Rss2Adapter(DeviceUtils.getScreenWidth(getActivity()));
+        recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         refreshLayout.setOnRefreshListener(new RefreshingListenerAdapter() {
             @Override
             public void onRefreshBegin(boolean isRefresh) {
@@ -116,12 +122,7 @@ public class RssFragment extends Fragment {
                 }
             }
         });
-        refreshLayout.setEnableScrollToBottomAutoLoadMore(true);
         refreshLayout.autoRefresh(false);
-        recyclerView = view.findViewById(R.id.single_recycler);
-        adapter = new Rss2Adapter(DeviceUtils.getScreenWidth(getActivity()));
-        recyclerView.setAdapter(adapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         // TODO: 2017/8/11 tag picasso
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             Object tag = new Object();
@@ -139,7 +140,21 @@ public class RssFragment extends Fragment {
 
     }
 
-//    // TODO: Rename method, update argument and hook method into UI event
+    public String getTitle() {
+        return title;
+    }
+
+    private boolean refresh = true;
+
+    public boolean isRefresh() {
+        return refresh;
+    }
+
+    public void setRefresh(boolean refresh) {
+        this.refresh = refresh;
+    }
+
+    //    // TODO: Rename method, update argument and hook method into UI event
 //    public void onButtonPressed(Uri uri) {
 //        if (mListener != null) {
 //            mListener.onFragmentInteraction(uri);

@@ -4,10 +4,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
-import com.morladim.morganrss.R;
-import com.morladim.morganrss.base.RssApplication;
 import com.morladim.morganrss.base.database.entity.Channel;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -20,15 +19,29 @@ public class RssPagerAdapter extends FragmentStatePagerAdapter {
 
     private volatile List<Channel> data;
 
+    private HashMap<Channel, RssFragment> map;
+
     public RssPagerAdapter(FragmentManager fm, List<Channel> data) {
         super(fm);
         this.data = data;
+        map = new HashMap<>();
     }
 
     @Override
     public Fragment getItem(int position) {
         Channel channel = data.get(position);
-        return RssFragment.newInstance(channel.getTitle(), channel.getRequestUrl(), channel.getId());
+        RssFragment fragment = RssFragment.newInstance(channel.getTitle(), channel.getRequestUrl(), channel.getId());
+        map.put(channel, fragment);
+        return fragment;
+    }
+
+    @Override
+    public int getItemPosition(Object object) {
+        if (object instanceof RssFragment && ((RssFragment) object).isRefresh()) {
+            ((RssFragment) object).setRefresh(false);
+            return POSITION_NONE;
+        }
+        return super.getItemPosition(object);
     }
 
     @Override
@@ -51,36 +64,43 @@ public class RssPagerAdapter extends FragmentStatePagerAdapter {
      *
      * @param channel 待加入的channel
      */
-    public synchronized void addItemByOrder(Channel channel) {
-        int positionInXml = RssPagerAdapter.getChannelPositionByUrl(channel.getRequestUrl());
-        if (positionInXml < 0 || data.size() == 0) {
+    public void addItemByOrder(Channel channel) {
+        if (data.size() == 0) {
             data.add(channel);
         } else {
+            boolean add = false;
             for (int i = 0, count = data.size(); i < count; i++) {
-                int j = getChannelPositionByUrl(data.get(i).getRequestUrl());
-                if (j > positionInXml) {
-                    data.add(i, channel);
-                    break;
+                if (add) {
+                    RssFragment fragment = map.get(data.get(i));
+                    if (fragment != null) {
+                        fragment.setRefresh(true);
+                    }
+                    continue;
                 }
-                if (i == count - 1) {
-                    data.add(channel);
+
+                if (channel.getOrderInCurrentGroup() < data.get(i).getOrderInCurrentGroup()) {
+                    add = true;
+                    data.add(i, channel);
+//                    break;
                 }
             }
-
+            if (!add) {
+                data.add(channel);
+            }
         }
         notifyDataSetChanged();
     }
 
-
-    private static final String[] URLS = RssApplication.getContext().getResources().getStringArray(R.array.default_urls);
-
-    public static int getChannelPositionByUrl(String channelUrl) {
-        for (int i = 0, count = URLS.length; i < count; i++) {
-            if (URLS[i].equals(channelUrl)) {
-                return i;
-            }
-        }
-        return -1;
-    }
+//
+//    private static final String[] URLS = RssApplication.getContext().getResources().getStringArray(R.array.default_urls);
+//
+//    public static int getChannelPositionByUrl(String channelUrl) {
+//        for (int i = 0, count = URLS.length; i < count; i++) {
+//            if (URLS[i].equals(channelUrl)) {
+//                return i;
+//            }
+//        }
+//        return -1;
+//    }
 
 }

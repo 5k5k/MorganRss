@@ -74,6 +74,7 @@ public class ChannelManager extends BaseTableManager<Channel, ChannelDao> {
         return getDao().queryBuilder().where(ChannelDao.Properties.Title.eq(title), ChannelDao.Properties.RequestUrl.eq(link)).unique();
     }
 
+    @Deprecated
     public Channel convertXmlToEntity(@NotNull Rss2Channel rss2Channel, long versionId, String requestUrl) {
         if (TextUtils.isEmpty(rss2Channel.title) || rss2Channel.linkList == null) {
             return null;
@@ -101,4 +102,6 @@ public class ChannelManager extends BaseTableManager<Channel, ChannelDao> {
         channel.setRequestUrl(requestUrl);
         return channel;
     }
+
+
 }
