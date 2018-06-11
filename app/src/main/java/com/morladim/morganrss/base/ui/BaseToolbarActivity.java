@@ -31,7 +31,6 @@ public abstract class BaseToolbarActivity extends BaseActivity {
      */
     private void initToolbar() {
         toolbar = findViewById(R.id.toolbar);
-        toolbar.setTitle(getToolbarTitle());
         setSupportActionBar(toolbar);
         ActionBar ab = getSupportActionBar();
         if (ab != null) {
@@ -51,8 +50,11 @@ public abstract class BaseToolbarActivity extends BaseActivity {
         });
     }
 
-    protected String getToolbarTitle() {
-        return "";
+    protected void setToolbarTitle(String title) {
+        if (getSupportActionBar() == null) {
+            return;
+        }
+        getSupportActionBar().setTitle(title);
     }
 
     protected void initView(@IdRes int containerId) {

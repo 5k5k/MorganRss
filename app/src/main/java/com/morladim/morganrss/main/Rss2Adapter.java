@@ -277,7 +277,7 @@ public class Rss2Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         public void onClick(View view) {
             synchronized (OnImageClickListener.class) {
                 if (holderSoftReference != null && holderSoftReference.get() != null) {
-                    WebActivity.startNewActivity(holderSoftReference.get().title.getContext(), AppUtils.loadImage(), content);
+                    WebActivity.startNewActivity(holderSoftReference.get().title.getContext(), !AppUtils.loadImage(), title, content);
                 }
             }
         }
