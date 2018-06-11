@@ -22,7 +22,7 @@ class HeadInterceptor implements Interceptor {
     public Response intercept(@NonNull Chain chain) throws IOException {
         Request original = chain.request();
         Request.Builder requestBuilder = original.newBuilder()
-                .header("Cookie", SharedPreferencesUtils.loadString(original.url() + COOKIE))
+                .header("Cookie", SharedPreferencesUtils.getInstance().loadString(original.url() + COOKIE))
                 .method(original.method(), original.body());
         Request request = requestBuilder.build();
         return chain.proceed(request);

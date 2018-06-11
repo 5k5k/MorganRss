@@ -1,6 +1,8 @@
 package com.morladim.morganrss.base.util;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * 日期工具类
@@ -71,7 +73,17 @@ public class DateUtils {
         if (date == null) {
             return "未知时间";
         }
-        long time = new Date().getTime() - date.getTime();
+        long time = System.currentTimeMillis() - date.getTime();
+        if (time < 0) {
+            return getTimeString(date);
+        }
         return getFormatDate(time);
     }
+
+    public synchronized static String getTimeString(Date date) {
+        return SIMPLE_DATE_FORMAT.format(date);
+    }
+
+    public static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CHINA);
+
 }

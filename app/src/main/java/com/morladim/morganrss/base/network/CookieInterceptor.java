@@ -27,7 +27,7 @@ class CookieInterceptor implements Interceptor {
         String cookie = response.header("Set-Cookie");
         if (!TextUtils.isEmpty(cookie)) {
             Log.d("url + cookie", request.url() + " " + cookie);
-            SharedPreferencesUtils.saveString(request.url() + COOKIE, cookie);
+            SharedPreferencesUtils.getInstance().saveString(request.url() + COOKIE, cookie);
         }
         return response;
     }

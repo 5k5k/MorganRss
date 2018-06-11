@@ -193,8 +193,7 @@ public class ItemManager extends BaseTableManager<Item, ItemDao> {
         return getDao().queryBuilder().where(ItemDao.Properties.ChannelId.eq(channelId)).offset(offset).limit(limit).orderDesc(ItemDao.Properties.PubDate).list();
     }
 
-    public List<Item> getListFrom(long channelId, long itemId, int limit) {
-        return getDao().queryBuilder().where(ItemDao.Properties.ChannelId.eq(channelId), ItemDao.Properties.Id.gt(itemId)).limit(limit).orderDesc(ItemDao.Properties.PubDate).list();
+    public List<Item> getListFrom(long channelId, Date pubDate, int limit) {
+        return getDao().queryBuilder().where(ItemDao.Properties.ChannelId.eq(channelId), ItemDao.Properties.PubDate.lt(pubDate)).limit(limit).orderDesc(ItemDao.Properties.PubDate).list();
     }
 }
-

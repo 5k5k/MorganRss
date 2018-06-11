@@ -8,83 +8,6 @@
     <string name="image_description">imageDescription</string>
     <string name="title_activity_settings">Settings</string>
 
-    <!-- Strings related to Settings -->
-
-    <!-- Example General settings -->
-    <string name="pref_header_general">General</string>
-
-    <string name="pref_title_social_recommendations">Enable social recommendations</string>
-    <string name="pref_description_social_recommendations">Recommendations for people to contact
-        based on your message history
-    </string>
-
-    <string name="pref_title_display_name">Display name</string>
-    <string name="pref_default_display_name">John Smith</string>
-
-    <string name="pref_title_add_friends_to_messages">Add friends to messages</string>
-    <string-array name="pref_example_list_titles">
-        <item>Always</item>
-        <item>When possible</item>
-        <item>Never</item>
-    </string-array>
-    <string-array name="pref_example_list_values">
-        <item>1</item>
-        <item>0</item>
-        <item>-1</item>
-    </string-array>
-
-    <!-- Example settings for Data & Sync -->
-    <string name="pref_header_data_sync">Data &amp; sync</string>
-
-    <string name="pref_title_sync_frequency">Sync frequency</string>
-    <string-array name="pref_sync_frequency_titles">
-        <item>15 minutes</item>
-        <item>30 minutes</item>
-        <item>1 hour</item>
-        <item>3 hours</item>
-        <item>6 hours</item>
-        <item>Never</item>
-    </string-array>
-    <string-array name="pref_sync_frequency_values">
-        <item>15</item>
-        <item>30</item>
-        <item>60</item>
-        <item>180</item>
-        <item>360</item>
-        <item>-1</item>
-    </string-array>
-
-    <string-array name="list_preference_entries">
-        <item>Entry 1</item>
-        <item>Entry 2</item>
-        <item>Entry 3</item>
-    </string-array>
-
-    <string-array name="list_preference_entry_values">
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-    </string-array>
-
-    <string-array name="multi_select_list_preference_default_value" />
-
-    <string name="pref_title_system_sync_settings">System sync settings</string>
-
-    <!-- Example settings for Notifications -->
-    <string name="pref_header_notifications">Notifications</string>
-
-    <string name="pref_title_new_message_notifications">New message notifications</string>
-
-    <string name="pref_title_ringtone">Ringtone</string>
-    <string name="pref_ringtone_silent">Silent</string>
-
-    <string name="pref_title_vibrate">Vibrate</string>
-    <string name="title_activity_main2">Main2Activity</string>
-    <string name="section_format">Hello World from section: %1$d</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-
     <!-- 閃屏頁加載數據對話框 -->
     <string name="splash_load_data_dialog_title">加載數據</string>
     <string name="splash_load_data_dialog_message">當前未錄入頻道，是否加載推薦數據？</string>
@@ -101,6 +24,26 @@
     <string name="add_channel_group_name_null">頻道分組名稱不能為空！</string>
     <string name="default_group">默認分組</string>
     <string name="default_group_description">系統默認推薦的頻道分組列表。</string>
+
+    <!-- 網絡狀態與圖片顯示與否設置相結合的文字提示 -->
+    <string name="net_state_not_wifi_show_image">當前沒處在wifi環境下，根據設置將用流量顯示圖片！</string>
+    <string name="net_state_not_wifi_not_show_image">當前沒處在wifi環境下，根據設置將不顯示圖片！</string>
+    <string name="net_state_no_internet">网络无法连接！</string>
+    <string name="net_state_always_no_image">當前已設為始終不顯示圖片模式！</string>
+
+    <!-- 通用 -->
+    <string name="can_not_get_net_data">無法獲取網絡數據！</string>
+
+    <!-- log -->
+    <string name="log_multiple_done">channel load all done success %s, error %s</string>
+    <string name="log_multiple_one_channel_done">channel loaded title  %s</string>
+
+    <!-- hint -->
+    <string name="hint_multiple_load_failed">加載失敗%d項!</string>
+    <string name="log_load_channels_begin">loadChannels开始，共有%d项。</string>
+    <string name="log_load_channels_remain">generateChannels剩余%d项。</string>
+    <string name="log_load_channels_remain_current_error">generateChannels剩余%d项，当前项错误！</string>
+    <string name="log_load_channels_result">generateChannels结束，成功%d项，失败%d项。</string>
 
 
 </resources>

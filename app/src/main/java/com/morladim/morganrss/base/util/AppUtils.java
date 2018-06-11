@@ -41,7 +41,7 @@ public class AppUtils {
     public static @ImageLoadMode
     int getImageLoadMode() {
         if (imageLoadMode == null) {
-            imageLoadMode = SharedPreferencesUtils.loadInt(NO_IMAGE, IMAGE_LOAD_ONLY_WIFI);
+            imageLoadMode = SharedPreferencesUtils.getInstance().loadInt(NO_IMAGE, IMAGE_LOAD_ONLY_WIFI);
         }
         return imageLoadMode;
     }
@@ -53,7 +53,7 @@ public class AppUtils {
      */
     public static synchronized void setImageLoadMode(@ImageLoadMode int mode) {
         AppUtils.imageLoadMode = mode;
-        SharedPreferencesUtils.saveInt(NO_IMAGE, mode);
+        SharedPreferencesUtils.getInstance().saveInt(NO_IMAGE, mode);
     }
 
     /**
@@ -67,7 +67,7 @@ public class AppUtils {
             return false;
         }
         //根據wifi環境判斷
-        return NetworkUtils.isConnectedWifi() || AppUtils.getImageLoadMode() == AppUtils.IMAGE_LOAD_ALWAYS;
+        return NetworkUtils.getInstance().isConnectedWifi() || AppUtils.getImageLoadMode() == AppUtils.IMAGE_LOAD_ALWAYS;
     }
 
     /**

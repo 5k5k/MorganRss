@@ -116,7 +116,7 @@ public class AddChannelDialogFragment extends DialogFragment {
      */
     private boolean checkValues() {
         if (getArguments().getBoolean(IS_FIRST)) {
-            if (urlET == null || !StringUtils.isUrl(urlET.getText().toString())) {
+            if (urlET == null || !StringUtils.getInstance().isUrl(urlET.getText().toString())) {
                 if (callback != null) {
                     callback.onFailed(getString(R.string.add_channel_incorrect_url));
                 }

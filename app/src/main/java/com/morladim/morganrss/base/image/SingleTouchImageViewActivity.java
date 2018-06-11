@@ -86,7 +86,7 @@ public class SingleTouchImageViewActivity extends Activity {
     private void loadImage() {
         postponeEnterTransition();
         final String imageUrl = getIntent().getStringExtra(IMAGE_URL);
-        ImageLoader.load(imageUrl).noFade().into(imageView, new Callback() {
+        ImageLoader.getInstance().load(imageUrl).noFade().into(imageView, new Callback() {
             @Override
             public void onSuccess() {
                 startPostponedEnterTransition();
@@ -124,9 +124,9 @@ public class SingleTouchImageViewActivity extends Activity {
                         Bitmap bitmap = ImageHolder.getInstance().load();
                         final String imageUrl = getIntent().getStringExtra(IMAGE_URL);
                         if (bitmap == null) {
-                            ImageLoader.load(imageUrl).into(imageView);
+                            ImageLoader.getInstance().load(imageUrl).into(imageView);
                         } else {
-                            ImageLoader.load(imageUrl).placeholder(new BitmapDrawable(imageView.getResources(), bitmap)).into(imageView);
+                            ImageLoader.getInstance().load(imageUrl).placeholder(new BitmapDrawable(imageView.getResources(), bitmap)).into(imageView);
                         }
                     }
 

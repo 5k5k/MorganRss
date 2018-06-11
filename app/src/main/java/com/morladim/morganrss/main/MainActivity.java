@@ -42,6 +42,8 @@ import timber.log.Timber;
  */
 public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+// TODO: 2018/6/6 在onresume中加入啟動其他進程service ；修改各個activity的主題
+    // TODO: 2018/6/6 tab位置和fragment位置不一致
 
     /**
      * 啟動MainActivity
@@ -96,22 +98,22 @@ public class MainActivity extends BaseActivity
         if (rootView == null) {
             rootView = findViewById(R.id.content_main);
         }
-        if (NetworkUtils.isConnected()) {
+        if (NetworkUtils.getInstance().isConnected()) {
             //沒處在wifi環境下
-            if (!NetworkUtils.isConnectedWifi()) {
+            if (!NetworkUtils.getInstance().isConnectedWifi()) {
                 if (AppUtils.getImageLoadMode() == AppUtils.IMAGE_LOAD_ALWAYS) {
-                    SnackbarUtils.showInfo(rootView, "當前沒處在wifi環境下，根據設置將用流量顯示圖片！");
+                    SnackbarUtils.showInfo(rootView, getString(R.string.net_state_not_wifi_show_image));
                 } else {
-                    SnackbarUtils.showInfo(rootView, "當前沒處在wifi環境下，根據設置將不顯示圖片！");
+                    SnackbarUtils.showInfo(rootView, getString(R.string.net_state_not_wifi_not_show_image));
                 }
             } else {
                 //wifi下但是設置為始終不顯示圖片時提示
                 if (AppUtils.getImageLoadMode() == AppUtils.IMAGE_NOT_LOAD) {
-                    SnackbarUtils.showInfo(rootView, "當前已設為始終不顯示圖片模式！");
+                    SnackbarUtils.showInfo(rootView, getString(R.string.net_state_always_no_image));
                 }
             }
         } else {
-            SnackbarUtils.showError(rootView, "网络无法连接！");
+            SnackbarUtils.showError(rootView, getString(R.string.net_state_no_internet));
         }
     }
 
@@ -164,9 +166,9 @@ public class MainActivity extends BaseActivity
         MultipleRequestManager.getInstance().loadChannels(newChannelList, new MultipleRequestManager.GenerateChannelsListener() {
             @Override
             public void allDone(int success, int error) {
-                Timber.d("channel load all done success %s, error %s", success, error);
+                Timber.d(getString(R.string.log_multiple_done), success, error);
                 if (error > 0) {
-                    SnackbarUtils.showWarn(rootView, String.format(Locale.CHINA, "加載失敗%d項!", error));
+                    SnackbarUtils.showWarn(rootView, String.format(Locale.CHINA, getString(R.string.hint_multiple_load_failed), error));
                 }
             }
 
@@ -174,7 +176,7 @@ public class MainActivity extends BaseActivity
             public void oneChannelDone(Channel channel) {
                 rssPagerAdapter.addItemByOrder(channel);
                 tabLayout.scrollTo((int) tabLayout.getChildAt(tabLayout.getSelectedTabPosition()).getX(), (int) tabLayout.getChildAt(tabLayout.getSelectedTabPosition()).getY());
-                Timber.d("channel loaded title  %s", channel.getTitle());
+                Timber.d(getString(R.string.log_multiple_one_channel_done), channel.getTitle());
             }
 
             @Override
@@ -198,22 +200,6 @@ public class MainActivity extends BaseActivity
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
-        }
-
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;

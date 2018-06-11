@@ -1,9 +1,12 @@
 package com.morladim.morganrss.base.util;
 
-import android.annotation.SuppressLint;
 import android.app.Application;
+import android.support.annotation.ArrayRes;
+import android.support.annotation.StringRes;
 import android.text.TextUtils;
 import android.util.Patterns;
+
+import com.morladim.morganrss.base.RssApplication;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -19,17 +22,26 @@ import java.util.Locale;
 public class StringUtils {
 
     private StringUtils() {
+        application = RssApplication.getContext();
     }
 
-    @SuppressLint("StaticFieldLeak")
-    private static Application application;
+    private Application application;
 
     public static final String SEPARATOR = "-";
 
     public static final String SEPARATOR_WITH_SPACE = " - ";
 
-    public static void init(Application application) {
-        StringUtils.application = application;
+    private volatile static StringUtils instance;
+
+    public static StringUtils getInstance() {
+        if (instance == null) {
+            synchronized (StringUtils.class) {
+                if (instance == null) {
+                    instance = new StringUtils();
+                }
+            }
+        }
+        return instance;
     }
 
     /**
@@ -38,7 +50,7 @@ public class StringUtils {
      * @param id 资源id
      * @return 资源对应字符串
      */
-    public static String getStringById(int id) {
+    public String getStringById(@StringRes int id) {
         return application.getString(id);
     }
 
@@ -48,7 +60,7 @@ public class StringUtils {
      * @param id 资源id
      * @return 资源对应字符串数组
      */
-    public static String[] getStringArrayById(int id) {
+    public String[] getStringArrayById(@ArrayRes int id) {
         return application.getResources().getStringArray(id);
     }
 
@@ -58,14 +70,14 @@ public class StringUtils {
      * @param string 原字符串
      * @return 字符串为null返回""，否则返回原字符串
      */
-    public static String getNonNullString(String string) {
+    public String getNonNullString(String string) {
         return string == null ? "" : string;
     }
 
     /**
      * 为空返回""，否则返回原字符串前带空格
      */
-    public static String getStringWithSpaceBehind(String string) {
+    public String getStringWithSpaceBehind(String string) {
         return TextUtils.isEmpty(string) ? "" : " " + string;
     }
 
@@ -75,19 +87,43 @@ public class StringUtils {
      * @param address 需要校验网址
      * @return 是否符合
      */
-    public static boolean isUrl(String address) {
+    public boolean isUrl(String address) {
         return Patterns.WEB_URL.matcher(address).matches();
+    }
+
+    /**
+     * 從指定格式建立字符串
+     *
+     * @param format 格式
+     * @param args   參數
+     * @return 結果
+     */
+    public String getStringFromFormat(String format, Object... args) {
+        return String.format(Locale.CHINA, format, args);
+    }
+
+    /**
+     * 從指定格式建立字符串
+     *
+     * @param formatRes 格式資源
+     * @param args      參數
+     * @return 結果
+     */
+    public String getStringFromFormat(@StringRes int formatRes, Object... args) {
+        return String.format(Locale.CHINA, application.getString(formatRes), args);
     }
 
     /**
      * 将时间戳转换为时间
      */
-    public static String stampToDate(String s) {
+    public String stampToDate(String s) {
         String res;
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CHINA);
         long lt = Long.valueOf(s);
         Date date = new Date(lt);
-        res = simpleDateFormat.format(date);
+        res = SIMPLE_DATE_FORMAT.format(date);
         return res;
     }
+
+   public static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CHINA);
+
 }

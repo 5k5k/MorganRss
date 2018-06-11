@@ -2,7 +2,7 @@ package com.morladim.morganrss.base.database.entity;
 
 import android.text.TextUtils;
 
-import com.morladim.morganrss.base.database.DBUtils;
+import com.morladim.morganrss.base.database.DbDateUtils;
 import com.morladim.morganrss.base.database.dao.CategoryDao;
 import com.morladim.morganrss.base.database.dao.DaoSession;
 import com.morladim.morganrss.base.database.dao.ItemDao;
@@ -102,7 +102,7 @@ public class Item {
         if (TextUtils.isEmpty(pubDate)) {
             return;
         }
-        this.pubDate = DBUtils.convertStringToDate(pubDate);
+        this.pubDate = DbDateUtils.convertStringToDate(pubDate);
     }
 
     public Long getId() {

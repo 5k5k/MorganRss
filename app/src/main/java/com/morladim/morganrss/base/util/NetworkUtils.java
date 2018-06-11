@@ -1,11 +1,11 @@
 package com.morladim.morganrss.base.util;
 
-import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.util.Log;
+
+import com.morladim.morganrss.base.RssApplication;
 
 /**
  * 网络工具类
@@ -16,21 +16,29 @@ import android.util.Log;
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class NetworkUtils {
 
-    @SuppressLint("StaticFieldLeak")
-    private static Application application;
+    private Application application;
     public static final int WIFI_CONNECTED = 0;
     public static final int NO_NETWORK = 1;
     public static final int NO_WIFI = 2;
 
     private NetworkUtils() {
-        throw new AssertionError("no instance");
+        application = RssApplication.getContext();
     }
 
-    public static void init(Application application) {
-        NetworkUtils.application = application;
+    private volatile static NetworkUtils instance;
+
+    public static NetworkUtils getInstance() {
+        if (instance == null) {
+            synchronized (NetworkUtils.class) {
+                if (instance == null) {
+                    instance = new NetworkUtils();
+                }
+            }
+        }
+        return instance;
     }
 
-    public static NetworkInfo getNetworkInfo() {
+    public NetworkInfo getNetworkInfo() {
         ConnectivityManager cm = (ConnectivityManager) application.getSystemService(Context.CONNECTIVITY_SERVICE);
         if (cm != null) {
             return cm.getActiveNetworkInfo();
@@ -38,22 +46,22 @@ public class NetworkUtils {
         return null;
     }
 
-    public static boolean isConnected() {
+    public boolean isConnected() {
         NetworkInfo info = getNetworkInfo();
         return (info != null && info.isConnected());
     }
 
-    public static boolean isConnectedWifi() {
+    public boolean isConnectedWifi() {
         NetworkInfo info = getNetworkInfo();
         return (info != null && info.isConnected() && info.getType() == ConnectivityManager.TYPE_WIFI);
     }
 
-    public static boolean isConnectedMobile() {
+    public boolean isConnectedMobile() {
         NetworkInfo info = getNetworkInfo();
         return (info != null && info.isConnected() && info.getType() == ConnectivityManager.TYPE_MOBILE);
     }
 
-    public static int checkNetworkState() {
+    public int checkNetworkState() {
         NetworkInfo info = getNetworkInfo();
         if (!(info != null && info.isConnected())) {
             return NO_NETWORK;

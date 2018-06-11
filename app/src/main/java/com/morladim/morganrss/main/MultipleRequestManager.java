@@ -1,9 +1,9 @@
 package com.morladim.morganrss.main;
 
-import android.util.Log;
-
+import com.morladim.morganrss.R;
 import com.morladim.morganrss.base.database.entity.Channel;
 import com.morladim.morganrss.base.network.NewsProvider;
+import com.morladim.morganrss.base.util.StringUtils;
 
 import java.util.List;
 
@@ -43,7 +43,7 @@ public class MultipleRequestManager {
         count = channelList.size();
         successCount = 0;
         errorCount = 0;
-        Log.d(TAG, "loadChannels开始，共有" + count + "项。");
+        Timber.d(StringUtils.getInstance().getStringFromFormat(R.string.log_load_channels_begin, count));
 
         NewsProvider.getChannels(channelList, new Consumer<Channel>() {
             @Override
@@ -51,7 +51,7 @@ public class MultipleRequestManager {
                 synchronized (OBJ) {
                     count--;
                     successCount++;
-                    Timber.d(TAG, "generateChannels剩余" + count + "项。");
+                    Timber.d(StringUtils.getInstance().getStringFromFormat(R.string.log_load_channels_remain, count));
                     checkDone(generateChannelsListener);
                 }
                 if (generateChannelsListener != null) {
@@ -60,11 +60,11 @@ public class MultipleRequestManager {
             }
         }, new Consumer<Throwable>() {
             @Override
-            public void accept(@NonNull Throwable throwable) throws Exception {
+            public void accept(@NonNull Throwable throwable) {
                 synchronized (OBJ) {
                     throwable.printStackTrace();
                     count--;
-                    Timber.d(TAG, "generateChannels剩余" + count + "项，当前项错误！");
+                    Timber.d(StringUtils.getInstance().getStringFromFormat(R.string.log_load_channels_remain_current_error, count));
                     errorCount++;
                     checkDone(generateChannelsListener);
                 }
@@ -77,13 +77,11 @@ public class MultipleRequestManager {
 
     private void checkDone(GenerateChannelsListener generateChannelsListener) {
         if (count == 0 && generateChannelsListener != null) {
-            Timber.d(TAG, "generateChannels结束，成功" + successCount + "项，失败" + errorCount + "项。");
+            Timber.d(StringUtils.getInstance().getStringFromFormat(R.string.log_load_channels_result, successCount, errorCount));
             generateChannelsListener.allDone(successCount, errorCount);
             working = false;
         }
     }
-
-    private static final String TAG = "MultipleRequestManager";
 
     private static volatile MultipleRequestManager multipleRequestManager;
 

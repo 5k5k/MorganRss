@@ -9,7 +9,7 @@ import org.greenrobot.greendao.annotation.Transient;
 
 import java.util.Date;
 
-import static com.morladim.morganrss.base.database.DBUtils.convertStringToDate;
+import static com.morladim.morganrss.base.database.DbDateUtils.convertStringToDate;
 
 /**
  * 因为要对item进行分页，所以不toMany item。

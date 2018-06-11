@@ -1,11 +1,10 @@
 package com.morladim.morganrss.base.util;
 
-import android.annotation.SuppressLint;
-import android.app.Application;
 import android.graphics.Bitmap;
 import android.util.Log;
 
 import com.morladim.morganrss.BuildConfig;
+import com.morladim.morganrss.base.RssApplication;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
 import com.squareup.picasso.StatsSnapshot;
@@ -20,19 +19,27 @@ import com.squareup.picasso.StatsSnapshot;
 public class ImageLoader {
     private static final String TAG = "ImageLoader";
 
-    @SuppressLint("StaticFieldLeak")
-    private static Picasso picasso;
+    private Picasso picasso;
 
-    private ImageLoader() {
+    private volatile static ImageLoader instance;
 
+    public static ImageLoader getInstance() {
+        if (instance == null) {
+            synchronized (ImageLoader.class) {
+                if (instance == null) {
+                    instance = new ImageLoader();
+                }
+            }
+        }
+        return instance;
     }
 
-    public static void init(Application context) {
-        picasso = Picasso.with(context);
+    private ImageLoader() {
+        picasso = Picasso.with(RssApplication.getContext());
         picasso.setIndicatorsEnabled(BuildConfig.DEBUG);
     }
 
-    public static void loggingEnabled(boolean enable) {
+    public void loggingEnabled(boolean enable) {
         picasso.setLoggingEnabled(enable);
     }
 
@@ -41,20 +48,20 @@ public class ImageLoader {
 //        picasso.setLoggingEnabled(false);
 //    }
 
-    public static RequestCreator load(String url) {
+    public RequestCreator load(String url) {
         return picasso.load(url).config(Bitmap.Config.RGB_565);
         //.memoryPolicy(MemoryPolicy.NO_CACHE)
     }
 
-    public static void resumeTag(Object tag) {
+    public void resumeTag(Object tag) {
         picasso.resumeTag(tag);
     }
 
-    public static void pauseTag(Object tag) {
+    public void pauseTag(Object tag) {
         picasso.pauseTag(tag);
     }
 
-    public static void getSnapshot() {
+    public void getSnapshot() {
         StatsSnapshot picassoStats = picasso.getSnapshot();
         Log.d(TAG, picassoStats.toString());
     }

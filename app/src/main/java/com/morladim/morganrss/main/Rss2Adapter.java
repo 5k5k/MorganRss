@@ -103,7 +103,7 @@ public class Rss2Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             rss2DefaultViewHolder.date.setText(DateUtils.getTimeToNow(item.getPubDate()));
 
             if (!TextUtils.isEmpty(item.getImageUrl())) {
-                ImageLoader.load(item.getImageUrl()).transform(transformation).into(rss2DefaultViewHolder.imageView);
+                ImageLoader.getInstance().load(item.getImageUrl()).transform(transformation).into(rss2DefaultViewHolder.imageView);
                 rss2DefaultViewHolder.imageView.setOnClickListener(new OnImageClickListener(rss2DefaultViewHolder, item.getImageUrl()));
             }
             rss2DefaultViewHolder.contentArea.setOnClickListener(new OnItemClickListener(rss2DefaultViewHolder, item.getTitle(), TextUtils.isEmpty(item.getContent()) ? item.getDescription() : item.getContent()));

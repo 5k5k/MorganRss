@@ -2,7 +2,6 @@ package com.morladim.morganrss.main;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.Application;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,10 +10,7 @@ import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.widget.Button;
 
-import com.facebook.stetho.Stetho;
-import com.morladim.morganrss.BuildConfig;
 import com.morladim.morganrss.R;
-import com.morladim.morganrss.base.RssApplication;
 import com.morladim.morganrss.base.database.ChannelGroupManager;
 import com.morladim.morganrss.base.database.ChannelJoinGroupManager;
 import com.morladim.morganrss.base.database.ChannelManager;
@@ -22,14 +18,9 @@ import com.morladim.morganrss.base.database.entity.Channel;
 import com.morladim.morganrss.base.database.entity.ChannelGroup;
 import com.morladim.morganrss.base.database.entity.ChannelJoinGroup;
 import com.morladim.morganrss.base.image.ImageService;
-import com.morladim.morganrss.base.util.ImageLoader;
-import com.morladim.morganrss.base.util.MorladimDebugTree;
-import com.morladim.morganrss.base.util.NetworkUtils;
-import com.morladim.morganrss.base.util.SharedPreferencesUtils;
 import com.morladim.morganrss.base.util.SnackbarUtils;
 import com.morladim.morganrss.base.util.StringUtils;
 import com.morladim.morganrss.base.web.WebService;
-import com.squareup.leakcanary.LeakCanary;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +32,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
-import timber.log.Timber;
 
 /**
  * 閃屏頁，加載數據跳轉主頁
@@ -57,8 +47,6 @@ public class SplashActivity extends Activity implements AddChannelDialogFragment
         disposable = Observable.create(new ObservableOnSubscribe<Integer>() {
             @Override
             public void subscribe(ObservableEmitter<Integer> e) {
-                //加載數據
-                initApplicationData(RssApplication.getContext());
                 //啟動其他進程
                 startService(new Intent(SplashActivity.this, ImageService.class));
                 startService(new Intent(SplashActivity.this, WebService.class));
@@ -78,26 +66,6 @@ public class SplashActivity extends Activity implements AddChannelDialogFragment
                         }
                     }
                 });
-    }
-
-    /**
-     * 初始化應用工具及數據等
-     *
-     * @param application 應用
-     */
-    private void initApplicationData(Application application) {
-        SharedPreferencesUtils.init(application);
-        ImageLoader.init(application);
-        NetworkUtils.init(application);
-        StringUtils.init(application);
-        Stetho.initializeWithDefaults(application);
-        if (BuildConfig.DEBUG) {
-            Timber.plant(new MorladimDebugTree());
-        }
-        if (LeakCanary.isInAnalyzerProcess(application)) {
-            return;
-        }
-        LeakCanary.install(application);
     }
 
     /**
@@ -166,7 +134,7 @@ public class SplashActivity extends Activity implements AddChannelDialogFragment
 
                 Long channelGroupId = channelGroup.getId();
 
-                String[] urls = StringUtils.getStringArrayById(R.array.default_urls);
+                String[] urls = StringUtils.getInstance().getStringArrayById(R.array.default_urls);
                 List<Channel> channelList = new ArrayList<>(urls.length);
                 for (String s : urls) {
                     Channel channel = new Channel();

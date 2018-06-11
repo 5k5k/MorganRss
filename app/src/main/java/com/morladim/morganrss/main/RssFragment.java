@@ -22,12 +22,8 @@ import java.util.List;
 
 import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Consumer;
-
 import me.dkzwm.widget.srl.RefreshingListenerAdapter;
 import me.dkzwm.widget.srl.SmoothRefreshLayout;
-import timber.log.Timber;
-
-import static me.dkzwm.widget.srl.config.Constants.MODE_SCALE;
 
 /**
  * @author morladim
@@ -63,12 +59,12 @@ public class RssFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_rss, container, false);
     }
 
-
     @Override
     public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
         rootView = view;
         refreshLayout = view.findViewById(R.id.smooth);
         refreshLayout.setEnableAutoLoadMore(true);
+        refreshLayout.setDisableLoadMore(false);
         recyclerView = view.findViewById(R.id.single_recycler);
         adapter = new Rss2Adapter(DeviceUtils.getScreenWidth(getActivity()));
         recyclerView.setAdapter(adapter);
@@ -97,7 +93,7 @@ public class RssFragment extends Fragment {
                     } else {
                         Item item = adapter.getDataAt(adapter.getItemCount() - 1);
                         if (item != null && item.getId() != null) {
-                            items = ItemManager.getInstance().getListFrom(item.getChannelId(), item.getId(), adapter.getLimit());
+                            items = ItemManager.getInstance().getListFrom(item.getChannelId(), item.getPubDate(), adapter.getLimit());
                         }
                     }
                     if (items != null && items.size() != 0) {
@@ -118,9 +114,9 @@ public class RssFragment extends Fragment {
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                    ImageLoader.resumeTag(tag);
+                    ImageLoader.getInstance().resumeTag(tag);
                 } else {
-                    ImageLoader.pauseTag(tag);
+                    ImageLoader.getInstance().pauseTag(tag);
                 }
             }
         });
@@ -129,13 +125,12 @@ public class RssFragment extends Fragment {
     }
 
     private void loadMore(List<Item> items) {
-        adapter.loadMore(items);
-        if (items.size() == adapter.getLimit()) {
-            adapter.setOffset(adapter.getOffset() + adapter.getLimit());
-            refreshLayout.setDisableLoadMore(false);
-        } else {
+        if (items.size() == 0) {
             refreshLayout.setDisableLoadMore(true);
+            refreshLayout.refreshComplete();
+            return;
         }
+        adapter.loadMore(items);
         refreshLayout.refreshComplete();
     }
 
@@ -146,10 +141,8 @@ public class RssFragment extends Fragment {
                 adapter.refresh(items);
                 if (items != null && items.size() == adapter.getLimit()) {
                     adapter.setOffset(adapter.getLimit());
-                    refreshLayout.setDisableLoadMore(false);
-                } else {
-                    refreshLayout.setDisableLoadMore(true);
                 }
+                refreshLayout.setDisableLoadMore(false);
                 refreshLayout.refreshComplete();
             }
         }, getErrorConsumer(), 0, adapter.getLimit());
