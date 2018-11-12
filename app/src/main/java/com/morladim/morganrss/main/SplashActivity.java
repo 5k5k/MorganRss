@@ -62,6 +62,7 @@ public class SplashActivity extends Activity implements AddChannelDialogFragment
                         if (integer == 0) {
                             showLoadDataDialog();
                         } else {
+//                            saveDefaultData();
                             startMainActivity();
                         }
                     }

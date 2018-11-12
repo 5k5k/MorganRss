@@ -194,6 +194,7 @@ public class ItemManager extends BaseTableManager<Item, ItemDao> {
     }
 
     public List<Item> getListFrom(long channelId, Date pubDate, int limit) {
+        // TODO: 2018/7/4  pubDate為空時會crash
         return getDao().queryBuilder().where(ItemDao.Properties.ChannelId.eq(channelId), ItemDao.Properties.PubDate.lt(pubDate)).limit(limit).orderDesc(ItemDao.Properties.PubDate).list();
     }
 }

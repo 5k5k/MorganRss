@@ -13,6 +13,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ExpandableListView;
 
 import com.morladim.morganrss.R;
 import com.morladim.morganrss.base.database.ChannelGroupManager;
@@ -84,6 +85,9 @@ public class MainActivity extends BaseActivity
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        ExpandableListView expandableListView = findViewById(R.id.list);
+        expandableListView.setAdapter(new MenuAdapter(this));
     }
 
     private void loadData() {
