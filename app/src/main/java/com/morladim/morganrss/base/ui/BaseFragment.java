@@ -3,12 +3,16 @@ package com.morladim.morganrss.base.ui;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
 
 /**
  * Fragment基類
@@ -24,6 +28,8 @@ public abstract class BaseFragment extends Fragment {
 
     private Activity activity;
 
+    private Unbinder unbinder;
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -32,8 +38,11 @@ public abstract class BaseFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(getLayoutResource(), container, false);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = ContentViewUtils.handle(this, inflater, container);
+        if (view != null) {
+            unbinder = ButterKnife.bind(this, view);
+        }
         onCreateView(view);
         return view;
     }
@@ -46,12 +55,13 @@ public abstract class BaseFragment extends Fragment {
         Log.d(TAG, msg);
     }
 
-    /**
-     * 设定布局资源
-     *
-     * @return 资源id
-     */
-    protected abstract int getLayoutResource();
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (unbinder != null) {
+            unbinder.unbind();
+        }
+    }
 
     protected void onCreateView(View view) {
 

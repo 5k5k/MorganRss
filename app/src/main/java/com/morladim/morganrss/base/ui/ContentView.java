@@ -7,11 +7,10 @@ import java.lang.annotation.Target;
 
 /**
  * @author morladim
- * @date 2018/11/12
+ * @date 2018/11/14
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE})
-public @interface UiController {
-
-    int reourceId();
+@Target(ElementType.TYPE)
+public @interface ContentView {
+    int value();
 }

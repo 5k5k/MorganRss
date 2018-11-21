@@ -2,24 +2,24 @@ package com.morladim.morganrss.main;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 
 import com.morladim.morganrss.R;
 import com.morladim.morganrss.base.database.ItemManager;
 import com.morladim.morganrss.base.database.entity.Item;
 import com.morladim.morganrss.base.network.ErrorConsumer;
 import com.morladim.morganrss.base.network.NewsProvider;
+import com.morladim.morganrss.base.ui.BaseFragment;
+import com.morladim.morganrss.base.ui.ContentView;
 import com.morladim.morganrss.base.util.DeviceUtils;
 import com.morladim.morganrss.base.util.ImageLoader;
 
 import java.lang.ref.SoftReference;
 import java.util.List;
 
+import butterknife.BindView;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Consumer;
 import me.dkzwm.widget.srl.RefreshingListenerAdapter;
@@ -28,11 +28,8 @@ import me.dkzwm.widget.srl.SmoothRefreshLayout;
 /**
  * @author morladim
  */
-public class RssFragment extends Fragment {
-
-    public RssFragment() {
-        // Required empty public constructor
-    }
+@ContentView(R.layout.fragment_rss)
+public class RssFragment extends BaseFragment {
 
     public static RssFragment newInstance(String title, String url, long id) {
         RssFragment fragment = new RssFragment();
@@ -55,20 +52,35 @@ public class RssFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_rss, container, false);
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        if (isVisibleToUser && !loadDone && initView) {
+            init();
+            loadDone = true;
+        }
+        if (isVisibleToUser) {
+            hasShown = true;
+        }
+        super.setUserVisibleHint(isVisibleToUser);
     }
 
     @Override
     public void onViewCreated(final View view, @Nullable Bundle savedInstanceState) {
         rootView = view;
-        refreshLayout = view.findViewById(R.id.smooth);
+        if (!initView) {
+            initView = true;
+        }
+        if (hasShown && !loadDone) {
+            init();
+            loadDone = true;
+        }
+    }
+
+    private void init() {
         refreshLayout.setEnableAutoLoadMore(true);
         refreshLayout.setDisableLoadMore(false);
-        recyclerView = view.findViewById(R.id.single_recycler);
-        adapter = new Rss2Adapter(DeviceUtils.getScreenWidth(getActivity()));
+        adapter = new Rss2Adapter(DeviceUtils.getScreenWidth(getAttachActivity()));
         recyclerView.setAdapter(adapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerView.setLayoutManager(new LinearLayoutManager(getAttachActivity()));
         refreshLayout.setOnRefreshListener(new RefreshingListenerAdapter() {
             @Override
             public void onRefreshBegin(boolean isRefresh) {
@@ -121,7 +133,6 @@ public class RssFragment extends Fragment {
             }
         });
         // TODO: 2017/7/19 需要加入访问网络前网络状态的判断
-
     }
 
     private void loadMore(List<Item> items) {
@@ -170,7 +181,6 @@ public class RssFragment extends Fragment {
         return title;
     }
 
-
     public boolean isRefresh() {
         return refresh;
     }
@@ -187,9 +197,15 @@ public class RssFragment extends Fragment {
     private String url;
     private long id;
 
-    private RecyclerView recyclerView;
+    @BindView(R.id.single_recycler)
+    RecyclerView recyclerView;
 
-    private SmoothRefreshLayout refreshLayout;
+    @BindView(R.id.smooth)
+    SmoothRefreshLayout refreshLayout;
+
+    private boolean loadDone = false;
+    private boolean initView = false;
+    private boolean hasShown = false;
 
     private Rss2Adapter adapter;
 

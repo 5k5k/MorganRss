@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.GravityCompat;
@@ -20,6 +21,7 @@ import com.morladim.morganrss.base.database.ChannelGroupManager;
 import com.morladim.morganrss.base.database.entity.Channel;
 import com.morladim.morganrss.base.database.entity.ChannelGroup;
 import com.morladim.morganrss.base.ui.BaseActivity;
+import com.morladim.morganrss.base.ui.ContentView;
 import com.morladim.morganrss.base.util.AppUtils;
 import com.morladim.morganrss.base.util.NetworkUtils;
 import com.morladim.morganrss.base.util.SnackbarUtils;
@@ -28,6 +30,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import butterknife.BindString;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
@@ -41,9 +46,10 @@ import timber.log.Timber;
  *
  * @author morladim
  */
+@ContentView(R.layout.activity_main)
 public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-// TODO: 2018/6/6 在onresume中加入啟動其他進程service ；修改各個activity的主題
+    // TODO: 2018/6/6 在onresume中加入啟動其他進程service ；修改各個activity的主題
     // TODO: 2018/6/6 tab位置和fragment位置不一致
 
     /**
@@ -59,34 +65,22 @@ public class MainActivity extends BaseActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        initView();
-        loadData();
-    }
-
-    /**
-     * 初始化視圖
-     */
-    private void initView() {
-        setContentView(R.layout.activity_main);
+        //有include的时候要以这种方式绑定view
+        ButterKnife.bind(R.layout.content_activity_main, rootView);
         initDrawer();
+        loadData();
     }
 
     /**
      * 初始化抽屜菜單
      */
     private void initDrawer() {
-        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
-
-        NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
-        ExpandableListView expandableListView = findViewById(R.id.list);
         expandableListView.setAdapter(new MenuAdapter(this));
     }
 
@@ -99,25 +93,22 @@ public class MainActivity extends BaseActivity
      * 顯示提示
      */
     private void showLoadImageHint() {
-        if (rootView == null) {
-            rootView = findViewById(R.id.content_main);
-        }
         if (NetworkUtils.getInstance().isConnected()) {
             //沒處在wifi環境下
             if (!NetworkUtils.getInstance().isConnectedWifi()) {
                 if (AppUtils.getImageLoadMode() == AppUtils.IMAGE_LOAD_ALWAYS) {
-                    SnackbarUtils.showInfo(rootView, getString(R.string.net_state_not_wifi_show_image));
+                    SnackbarUtils.showInfo(rootView, showImageWithoutWifi);
                 } else {
-                    SnackbarUtils.showInfo(rootView, getString(R.string.net_state_not_wifi_not_show_image));
+                    SnackbarUtils.showInfo(rootView, notShowImageWithoutWifi);
                 }
             } else {
                 //wifi下但是設置為始終不顯示圖片時提示
                 if (AppUtils.getImageLoadMode() == AppUtils.IMAGE_NOT_LOAD) {
-                    SnackbarUtils.showInfo(rootView, getString(R.string.net_state_always_no_image));
+                    SnackbarUtils.showInfo(rootView, notShowImageAlways);
                 }
             }
         } else {
-            SnackbarUtils.showError(rootView, getString(R.string.net_state_no_internet));
+            SnackbarUtils.showError(rootView, noInternet);
         }
     }
 
@@ -147,9 +138,8 @@ public class MainActivity extends BaseActivity
 
     private void initViewPager(List<Channel> list) {
         rssPagerAdapter = new RssPagerAdapter(getSupportFragmentManager(), list);
-        ViewPager viewPager = findViewById(R.id.container);
         viewPager.setAdapter(rssPagerAdapter);
-        tabLayout = findViewById(R.id.tabs);
+        viewPager.setOffscreenPageLimit(10);
         tabLayout.setupWithViewPager(viewPager);
         tabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
     }
@@ -170,9 +160,9 @@ public class MainActivity extends BaseActivity
         MultipleRequestManager.getInstance().loadChannels(newChannelList, new MultipleRequestManager.GenerateChannelsListener() {
             @Override
             public void allDone(int success, int error) {
-                Timber.d(getString(R.string.log_multiple_done), success, error);
+                Timber.d(loadResult, success, error);
                 if (error > 0) {
-                    SnackbarUtils.showWarn(rootView, String.format(Locale.CHINA, getString(R.string.hint_multiple_load_failed), error));
+                    SnackbarUtils.showWarn(rootView, String.format(Locale.CHINA, failedCount, error));
                 }
             }
 
@@ -180,7 +170,7 @@ public class MainActivity extends BaseActivity
             public void oneChannelDone(Channel channel) {
                 rssPagerAdapter.addItemByOrder(channel);
                 tabLayout.scrollTo((int) tabLayout.getChildAt(tabLayout.getSelectedTabPosition()).getX(), (int) tabLayout.getChildAt(tabLayout.getSelectedTabPosition()).getY());
-                Timber.d(getString(R.string.log_multiple_one_channel_done), channel.getTitle());
+                Timber.d(loadOne, channel.getTitle());
             }
 
             @Override
@@ -193,18 +183,16 @@ public class MainActivity extends BaseActivity
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
+//            TestActivity.start(this);
             drawer.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
         }
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
@@ -222,8 +210,68 @@ public class MainActivity extends BaseActivity
     /**
      * 根視圖
      */
-    private View rootView;
+    View rootView;
 
-    private TabLayout tabLayout;
+    /**
+     * 菜单
+     */
+    @BindView(R.id.drawer_layout)
+    DrawerLayout drawer;
 
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+
+    @BindView(R.id.nav_view)
+    NavigationView navigationView;
+
+    @BindView(R.id.list)
+    ExpandableListView expandableListView;
+
+    @BindView(R.id.container)
+    ViewPager viewPager;
+
+    @BindView(R.id.tabs)
+    TabLayout tabLayout;
+
+    /**
+     * 不在wifi下时显示图片提示
+     */
+    @BindString(R.string.net_state_not_wifi_show_image)
+    String showImageWithoutWifi;
+
+    /**
+     * 不在wifi下时不显示图片提示
+     */
+    @BindString(R.string.net_state_not_wifi_not_show_image)
+    String notShowImageWithoutWifi;
+
+    /**
+     * 始终不显示图片
+     */
+    @BindString(R.string.net_state_always_no_image)
+    String notShowImageAlways;
+
+    /**
+     * 无网络
+     */
+    @BindString(R.string.net_state_no_internet)
+    String noInternet;
+
+    /**
+     * 加载结果
+     */
+    @BindString(R.string.log_multiple_done)
+    String loadResult;
+
+    /**
+     * 失败条数
+     */
+    @BindString(R.string.hint_multiple_load_failed)
+    String failedCount;
+
+    /**
+     * 加载一个频道成功提示
+     */
+    @BindString(R.string.log_multiple_one_channel_done)
+    String loadOne;
 }

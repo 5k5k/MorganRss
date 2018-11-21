@@ -4,8 +4,11 @@ import android.app.Application;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.wifi.WifiManager;
 
 import com.morladim.morganrss.base.RssApplication;
+
+import static android.content.Context.WIFI_SERVICE;
 
 /**
  * 网络工具类
@@ -44,6 +47,11 @@ public class NetworkUtils {
             return cm.getActiveNetworkInfo();
         }
         return null;
+    }
+
+    public boolean isWifiEnabled(Context context) {
+        WifiManager wm = (WifiManager) context.getApplicationContext().getSystemService(WIFI_SERVICE);
+        return wm != null && wm.isWifiEnabled();
     }
 
     public boolean isConnected() {
